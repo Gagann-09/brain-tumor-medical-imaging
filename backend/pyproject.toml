@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "armt-gan-backend"
+version = "0.1.0"
+description = "Backend for ARMT-GAN platform"
+authors = ["Your Name <you@example.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.110.0"
+uvicorn = "^0.28.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
