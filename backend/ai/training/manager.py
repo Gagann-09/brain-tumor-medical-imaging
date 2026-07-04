@@ -7,6 +7,8 @@ from .components import DistributedStrategy, SeedManager
 from .engine import EvaluationEngine, TrainingEngine
 from .events import Event, EventBus, EventType
 from .hardware import HardwareManager
+from ai.evaluation.robustness.monitors import OverfittingMonitor, UnderfittingMonitor
+from ai.training.policies import EarlyStoppingPolicy
 
 
 class TrainingManager:
@@ -49,6 +51,11 @@ class TrainingManager:
         # Initialize engines
         self.train_engine = TrainingEngine(self.model, self.strategy, self.event_bus)
         self.eval_engine = EvaluationEngine(self.model, self.event_bus)
+        
+        # Initialize robustness monitors
+        self.overfitting_monitor = OverfittingMonitor(patience=3, threshold=0.1)
+        self.underfitting_monitor = UnderfittingMonitor(high_loss_threshold=0.5, patience=3)
+        self.early_stopping_policy = EarlyStoppingPolicy()
 
     def register_callback(self, callback: Callback) -> None:
         self.callback_manager.add_callback(callback)
@@ -70,6 +77,16 @@ class TrainingManager:
 
                 # Evaluate
                 val_metrics = self.eval_engine.evaluate(self.val_loader)
+
+                # Monitor Robustness
+                train_loss = train_metrics.get("loss", 0.0)
+                val_loss = val_metrics.get("loss", 0.0)
+                self.overfitting_monitor.update(train_loss, val_loss)
+                self.underfitting_monitor.update(train_loss, val_loss)
+                
+                if self.early_stopping_policy.should_stop(self.overfitting_monitor.is_overfitting, self.underfitting_monitor.is_underfitting):
+                    print(f"Early stopping triggered at epoch {epoch}")
+                    break
 
         except KeyboardInterrupt:
             self.event_bus.publish(Event(EventType.ERROR, {"error": "KeyboardInterrupt"}))

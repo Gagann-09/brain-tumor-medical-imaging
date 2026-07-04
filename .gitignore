@@ -196,6 +196,10 @@ datasets/*
 *.tflite
 *.mlmodel
 *.engine
+models/*
+!models/.gitkeep
+!models/README.md
+
 
 # ------------------------------------------------------------------------------
 # 12. Experiment Outputs & ML Artifacts
@@ -206,6 +210,15 @@ experiments/*
 outputs/*
 !outputs/.gitkeep
 !outputs/README.md
+backend/outputs_val/*
+!backend/outputs_val/.gitkeep
+!backend/outputs_val/README.md
+test_robustness_output/*
+!test_robustness_output/.gitkeep
+!test_robustness_output/README.md
+test_xai_output/*
+!test_xai_output/.gitkeep
+!test_xai_output/README.md
 results/*
 !results/.gitkeep
 !results/README.md

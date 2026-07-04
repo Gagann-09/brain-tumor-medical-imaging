@@ -23,8 +23,10 @@ class ModelCard(BaseModel):
     configuration_checksum: str = "unknown"
     dataset_info: dict[str, Any]
     dataset_version: str = "unknown"
-    metrics: dict[str, float]
+    metrics: dict[str, Any]
     benchmark_summary: dict[str, Any] = Field(default_factory=dict)
+    experiment_health_score: float = 0.0
+    generalization_report_ref: str = ""
     
     software_versions: dict[str, str] = Field(default_factory=dict)
     hardware_information: str = "unknown"
@@ -46,10 +48,23 @@ class ModelCard(BaseModel):
 
         md += "## Description\n"
         md += f"{self.model_details.description}\n\n"
+        
+        md += "## Experiment Health\n"
+        md += f"- **Health Score**: {self.experiment_health_score:.2f}\n"
+        if self.generalization_report_ref:
+            md += f"- **Generalization Report**: {self.generalization_report_ref}\n\n"
 
         md += "## Metrics\n"
         for k, v in self.metrics.items():
-            md += f"- **{k}**: {v:.4f}\n"
+            if isinstance(v, dict):
+                md += f"- **{k}**:\n"
+                for sub_k, sub_v in v.items():
+                    if isinstance(sub_v, dict):
+                        md += f"  - **{sub_k}**: {sub_v}\n"
+                    else:
+                        md += f"  - **{sub_k}**: {sub_v:.4f}\n"
+            else:
+                md += f"- **{k}**: {v:.4f}\n"
         md += "\n"
 
         md += "## Limitations\n"

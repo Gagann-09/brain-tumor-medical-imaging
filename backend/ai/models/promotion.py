@@ -107,6 +107,69 @@ class ModelPromotionManager:
         self._save_registry()
         return True
         
+    def evaluate_classification_candidate(
+        self, 
+        candidate_model: str, 
+        candidate_version: str, 
+        baseline_metrics: dict, 
+        candidate_metrics: dict, 
+        benchmark_id: str
+    ) -> bool:
+        """
+        Evaluates a classification candidate against multiple criteria (F1, ROC AUC, Brier Score, Latency).
+        """
+        record_id = f"{candidate_model}_{candidate_version}"
+        if record_id not in self.records:
+            return False
+            
+        record = self.records[record_id]
+        
+        c_f1 = candidate_metrics.get("f1_score", 0.0)
+        b_f1 = baseline_metrics.get("f1_score", 0.0)
+        
+        c_roc = candidate_metrics.get("roc_auc", 0.0)
+        b_roc = baseline_metrics.get("roc_auc", 0.0)
+        
+        c_brier = candidate_metrics.get("brier_score", float('inf'))
+        b_brier = baseline_metrics.get("brier_score", float('inf'))
+        
+        c_latency = candidate_metrics.get("avg_inference_latency_sec", 0.0)
+        b_latency = baseline_metrics.get("avg_inference_latency_sec", 0.0)
+        
+        reasons = []
+        
+        if c_f1 < b_f1 - 0.02: # Allow slight F1 degradation if other metrics are much better, but strict threshold
+            reasons.append(f"F1 Score degraded too much (Base: {b_f1:.4f}, Cand: {c_f1:.4f})")
+            
+        if c_roc < b_roc - 0.01:
+            reasons.append(f"ROC AUC degraded (Base: {b_roc:.4f}, Cand: {c_roc:.4f})")
+            
+        if c_brier > b_brier + 0.05:
+            reasons.append(f"Calibration (Brier) worsened (Base: {b_brier:.4f}, Cand: {c_brier:.4f})")
+            
+        if c_latency > b_latency * 1.5:
+            reasons.append(f"Latency degraded >50% (Base: {b_latency:.3f}s, Cand: {c_latency:.3f}s)")
+            
+        # Overall score check
+        # Require improvement in at least one primary metric without failing the thresholds above
+        improved = (c_f1 > b_f1) or (c_roc > b_roc) or (c_brier < b_brier)
+        
+        if reasons:
+            record.promotion_reason = "Failed: " + "; ".join(reasons)
+            self._save_registry()
+            return False
+            
+        if not improved:
+            record.promotion_reason = "Failed: Did not improve any primary metric (F1, ROC AUC, Brier)."
+            self._save_registry()
+            return False
+            
+        record.state = ModelLifecycleState.VALIDATED
+        record.benchmark_id = benchmark_id
+        record.promotion_reason = "Passed: Classification metrics surpassed baseline."
+        self._save_registry()
+        return True
+        
     def promote_to_production(self, model_name: str, version: str) -> None:
         """Promotes a VALIDATED model to PRODUCTION. Archives the old production model."""
         record_id = f"{model_name}_{version}"
@@ -119,3 +182,36 @@ class ModelPromotionManager:
                     
             self.records[record_id].state = ModelLifecycleState.PRODUCTION
             self._save_registry()
+
+    def evaluate_promotion_robust(
+        self, 
+        candidate_model: str, 
+        candidate_version: str, 
+        health_score: float,
+        critical_failures: list[str],
+        benchmark_id: str
+    ) -> bool:
+        """
+        Evaluates promotion based on the Experiment Health Score and critical failures.
+        """
+        record_id = f"{candidate_model}_{candidate_version}"
+        if record_id not in self.records:
+            return False
+            
+        record = self.records[record_id]
+        
+        if critical_failures:
+            record.promotion_reason = "Failed: Critical failures detected: " + ", ".join(critical_failures)
+            self._save_registry()
+            return False
+            
+        if health_score < 70.0: # Assuming 70 is passing threshold
+            record.promotion_reason = f"Failed: Health Score ({health_score:.2f}) below passing threshold (70.0)."
+            self._save_registry()
+            return False
+            
+        record.state = ModelLifecycleState.VALIDATED
+        record.benchmark_id = benchmark_id
+        record.promotion_reason = f"Passed: Health Score {health_score:.2f} met criteria."
+        self._save_registry()
+        return True

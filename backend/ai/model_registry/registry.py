@@ -1,5 +1,6 @@
 """Model registry implementation."""
 from datetime import datetime
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -10,7 +11,7 @@ class ModelRegistration(BaseModel):
     version: str
     task: str
     dataset: str
-    metrics: dict[str, float] = Field(default_factory=dict)
+    metrics: dict[str, Any] = Field(default_factory=dict)
     checksum: str
     framework: str
     created_date: datetime = Field(default_factory=datetime.utcnow)

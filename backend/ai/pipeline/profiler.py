@@ -10,6 +10,10 @@ except ImportError:
 
 import torch
 from torch.profiler import profile, record_function, ProfilerActivity
+import matplotlib.pyplot as plt
+from ai.evaluation.robustness.health_score import ExperimentHealthScoreCalculator
+from ai.evaluation.robustness.report import GeneralizationReport
+from ai.evaluation.robustness.analyzers import LearningCurveAnalyzer
 
 class ExperimentProfiler:
     """
@@ -83,3 +87,63 @@ class ExperimentProfiler:
     def save_report(self, filename: str = "performance_report.json"):
         with open(self.output_dir / filename, "w") as f:
             json.dump(self.metrics, f, indent=4)
+
+    def generate_generalization_report(
+        self, 
+        experiment_id: str, 
+        train_history: list, 
+        val_history: list,
+        has_leakage: bool, 
+        failed_cv: bool, 
+        failed_calibration: bool,
+        performance_score: float, 
+        generalization_score: float,
+        stability_score: float, 
+        calibration_score: float,
+        reproducibility_score: float, 
+        data_quality_score: float,
+        excessive_gap: bool, 
+        has_nan_inf: bool
+    ) -> GeneralizationReport:
+                                      
+        # 1. Analyze learning curves
+        curve_analysis = LearningCurveAnalyzer.analyze_curve(train_history, val_history)
+        
+        # 2. Compute Health Score
+        health_score = ExperimentHealthScoreCalculator.calculate(
+            performance_score, generalization_score, stability_score, calibration_score,
+            reproducibility_score, data_quality_score, has_leakage, has_nan_inf,
+            excessive_gap, failed_cv, failed_calibration
+        )
+        
+        # 3. Generate learning curve plot
+        plt.figure(figsize=(10, 6))
+        plt.plot(train_history, label='Train Loss')
+        plt.plot(val_history, label='Validation Loss')
+        plt.title('Learning Curve')
+        plt.xlabel('Epoch')
+        plt.ylabel('Loss')
+        plt.legend()
+        plot_path = self.output_dir / f"{experiment_id}_learning_curve.png"
+        plt.savefig(plot_path)
+        plt.close()
+        
+        # 4. Create report
+        report = GeneralizationReport(
+            experiment_id=experiment_id,
+            overfitting_status=curve_analysis.get('divergence', False),
+            underfitting_status=curve_analysis.get('plateau', False),
+            leakage_status=has_leakage,
+            generalization_gap={}, # Can be populated from calculator output if needed
+            cross_validation_summary={},
+            calibration_summary={},
+            experiment_health_score=health_score,
+            promotion_recommendation="Promote" if health_score >= 70.0 and not has_leakage and not failed_cv and not failed_calibration and not excessive_gap and not has_nan_inf else "Do Not Promote",
+            curve_analysis=curve_analysis
+        )
+        
+        # 5. Save report
+        with open(self.output_dir / f"{experiment_id}_generalization.json", "w") as f:
+            f.write(report.to_json())
+            
+        return report

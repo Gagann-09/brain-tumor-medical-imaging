@@ -2,7 +2,7 @@ import torch
 from abc import ABC, abstractmethod
 from typing import Dict, Any
 
-from ai.interfaces.models import BaseModel, PredictionResult, TrainingOutput, ValidationOutput
+from ai.models.base import BaseModel, PredictionResult, TrainingOutput, ValidationOutput
 
 class BaseClassificationModel(BaseModel):
     """
