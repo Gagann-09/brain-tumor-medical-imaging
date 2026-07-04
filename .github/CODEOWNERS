@@ -1,0 +1,18 @@
+# Default owners
+* @global-admin
+
+# Backend & ML
+/backend/ @backend-team
+/models/ @ml-team
+/datasets/ @ml-team
+
+# Frontend
+/frontend/ @frontend-team
+
+# Infrastructure & DevOps
+/infrastructure/ @devops-team
+/.github/workflows/ @devops-team
+
+# Security
+/security/ @security-team
+SECURITY.md @security-team

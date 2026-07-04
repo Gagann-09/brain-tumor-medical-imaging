@@ -1,0 +1,22 @@
+[importlinter]
+root_package = backend
+
+[importlinter:contract:layered-architecture]
+name = Enforce strict layered architecture
+type = layers
+layers =
+    backend.api
+    backend.services
+    backend.models
+    backend.infrastructure
+    backend.core
+
+[importlinter:contract:no-circular-imports]
+name = Prevent circular imports
+type = independence
+modules =
+    backend.api
+    backend.services
+    backend.models
+    backend.infrastructure
+    backend.core

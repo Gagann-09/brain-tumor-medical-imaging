@@ -1,0 +1,1 @@
+"""ARMT-GAN architecture implementation."""
