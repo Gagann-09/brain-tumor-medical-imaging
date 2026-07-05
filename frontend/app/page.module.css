@@ -1,0 +1,113 @@
+/* frontend/app/page.module.css */
+.container {
+  padding: var(--space-8);
+  width: 100%;
+  max-width: 1600px; /* Optimized for large screens */
+  margin: 0 auto;
+}
+
+.header {
+  margin-bottom: var(--space-8);
+}
+
+.title {
+  font-size: 1.5rem;
+  margin-bottom: var(--space-1);
+}
+
+.subtitle {
+  color: var(--text-secondary);
+}
+
+.grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.sectionTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.statusCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-4);
+}
+
+.metricLabel {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-2);
+}
+
+.metricValue {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.twoColumn {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6);
+}
+
+.fullHeight {
+  height: 100%;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.listItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: var(--space-4);
+  border-bottom: var(--border-light);
+}
+.listItem:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.listTitle {
+  font-weight: 500;
+}
+
+.listSub {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.badgeWarning {
+  background-color: var(--color-warning);
+  color: white;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badgeNeutral {
+  background-color: var(--color-primary-200);
+  color: var(--text-primary);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+}

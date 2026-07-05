@@ -7,6 +7,8 @@ from .prediction import Prediction
 from .segmentation import SegmentationResult
 from .study import Study
 from .user import User
+from .inference import InferenceJobModel
+from .upload import UploadRecordModel
 
 __all__ = [
     "AuditLog",
@@ -16,4 +18,6 @@ __all__ = [
     "SegmentationResult",
     "Study",
     "User",
+    "InferenceJobModel",
+    "UploadRecordModel",
 ]

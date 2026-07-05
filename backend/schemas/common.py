@@ -1,13 +1,13 @@
 """Shared Pydantic response envelopes used across all endpoints."""
 
-from typing import TypeVar
+from typing import TypeVar, Generic
 
 from pydantic import BaseModel
 
 T = TypeVar("T")
 
 
-class APIResponse[T](BaseModel):
+class APIResponse(BaseModel, Generic[T]):
     """Standard success response."""
 
     success: bool = True
@@ -24,7 +24,7 @@ class APIErrorResponse(BaseModel):
     correlation_id: str
 
 
-class PaginatedData[T](BaseModel):
+class PaginatedData(BaseModel, Generic[T]):
     """Paginated list wrapper."""
 
     items: list[T] = []

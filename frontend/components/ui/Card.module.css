@@ -1,0 +1,36 @@
+/* frontend/components/ui/Card.module.css */
+.card {
+  background-color: var(--bg-surface);
+  border: var(--border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.header {
+  padding: var(--space-4) var(--space-5);
+  border-bottom: var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.body {
+  padding: var(--space-5);
+  flex-grow: 1;
+}
+
+.footer {
+  padding: var(--space-4) var(--space-5);
+  border-top: var(--border-light);
+  background-color: var(--bg-surface-hover);
+}

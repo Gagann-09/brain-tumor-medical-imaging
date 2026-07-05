@@ -24,6 +24,11 @@ class EventType(Enum):
     EVALUATION_END = "evaluation_end"
     CHECKPOINT_SAVED = "checkpoint_saved"
     ERROR = "error"
+    INFERENCE_STARTED = "inference_started"
+    STAGE_STARTED = "stage_started"
+    STAGE_FINISHED = "stage_finished"
+    INFERENCE_FINISHED = "inference_finished"
+    INFERENCE_FAILED = "inference_failed"
 
 class Event:
     """A generic event containing context data."""

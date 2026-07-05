@@ -1,0 +1,57 @@
+/* frontend/app/health/page.module.css */
+.container {
+  padding: var(--space-8);
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  margin-bottom: var(--space-8);
+}
+
+.title {
+  font-size: 1.5rem;
+  margin-bottom: var(--space-1);
+}
+
+.subtitle {
+  color: var(--text-secondary);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: var(--space-6);
+}
+
+.serviceList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.serviceItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: var(--space-3);
+  border-bottom: var(--border-light);
+}
+
+.serviceItem:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.statusSuccess {
+  color: var(--color-success);
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.resourceList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}

@@ -1,39 +1,26 @@
 # ==============================================================================
-# Enterprise AI Monorepo .gitattributes
+# ARM-GAN Platform .gitattributes
 # ==============================================================================
 
-# ------------------------------------------------------------------------------
-# Text Files & Normalization
-# ------------------------------------------------------------------------------
+# ── Text Normalization ────────────────────────────────────────────────────────
 * text=auto eol=lf
 
-# ------------------------------------------------------------------------------
-# Machine Learning Models (LFS)
-# ------------------------------------------------------------------------------
-*.pt filter=lfs diff=lfs merge=lfs -text
-*.pth filter=lfs diff=lfs merge=lfs -text
-*.h5 filter=lfs diff=lfs merge=lfs -text
-*.hdf5 filter=lfs diff=lfs merge=lfs -text
-*.keras filter=lfs diff=lfs merge=lfs -text
-*.onnx filter=lfs diff=lfs merge=lfs -text
-*.pb filter=lfs diff=lfs merge=lfs -text
-*.ckpt filter=lfs diff=lfs merge=lfs -text
+# ── ML Model Files (Git LFS) ─────────────────────────────────────────────────
+*.pt       filter=lfs diff=lfs merge=lfs -text
+*.pth      filter=lfs diff=lfs merge=lfs -text
+*.h5       filter=lfs diff=lfs merge=lfs -text
+*.hdf5     filter=lfs diff=lfs merge=lfs -text
+*.keras    filter=lfs diff=lfs merge=lfs -text
+*.onnx     filter=lfs diff=lfs merge=lfs -text
+*.pb       filter=lfs diff=lfs merge=lfs -text
+*.ckpt     filter=lfs diff=lfs merge=lfs -text
 *.safetensors filter=lfs diff=lfs merge=lfs -text
-*.bin filter=lfs diff=lfs merge=lfs -text
-*.pkl filter=lfs diff=lfs merge=lfs -text
-*.joblib filter=lfs diff=lfs merge=lfs -text
-*.tflite filter=lfs diff=lfs merge=lfs -text
-*.mlmodel filter=lfs diff=lfs merge=lfs -text
-*.engine filter=lfs diff=lfs merge=lfs -text
+*.tflite   filter=lfs diff=lfs merge=lfs -text
 
-# ------------------------------------------------------------------------------
-# Medical Imaging & Datasets (LFS)
-# ------------------------------------------------------------------------------
-*.dcm filter=lfs diff=lfs merge=lfs -text
-*.nii filter=lfs diff=lfs merge=lfs -text
-*.nii.gz filter=lfs diff=lfs merge=lfs -text
-*.mha filter=lfs diff=lfs merge=lfs -text
-*.mhd filter=lfs diff=lfs merge=lfs -text
-*.raw filter=lfs diff=lfs merge=lfs -text
-*.zraw filter=lfs diff=lfs merge=lfs -text
-*.nrrd filter=lfs diff=lfs merge=lfs -text
+# ── Medical Imaging Files (Git LFS) ──────────────────────────────────────────
+*.dcm      filter=lfs diff=lfs merge=lfs -text
+*.nii      filter=lfs diff=lfs merge=lfs -text
+*.nii.gz   filter=lfs diff=lfs merge=lfs -text
+*.mha      filter=lfs diff=lfs merge=lfs -text
+*.mhd      filter=lfs diff=lfs merge=lfs -text
+*.nrrd     filter=lfs diff=lfs merge=lfs -text

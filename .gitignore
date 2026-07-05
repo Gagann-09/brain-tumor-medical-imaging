@@ -1,36 +1,24 @@
 # ==============================================================================
-# Enterprise AI Monorepo .gitignore
+# ARM-GAN Platform .gitignore
 # ==============================================================================
 
-# ------------------------------------------------------------------------------
-# 1. Python & Caches
-# ------------------------------------------------------------------------------
+# ── 1. Python & Caches ───────────────────────────────────────────────────────
 __pycache__/
 *.py[cod]
-*.pyc
-*.pyo
-*.pyd
 *$py.class
 *.so
-.python-version
-.ipynb_checkpoints/
-.Python
-env/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
 *.egg
+*.egg-info/
+.eggs/
+*.whl
+build/
+dist/
+sdist/
+develop-eggs/
+.installed.cfg
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
 .pytest_cache/
 .coverage
 htmlcov/
@@ -39,30 +27,25 @@ htmlcov/
 .hypothesis/
 .mypy_cache/
 .ruff_cache/
-
-# ------------------------------------------------------------------------------
-# 2. Virtual Environments
-# ------------------------------------------------------------------------------
+.ipynb_checkpoints/
+.python-version
 venv/
 .venv/
-.env_python/
-pip-log.txt
-pip-delete-this-directory.txt
 
-# ------------------------------------------------------------------------------
-# 3. Environment Files
-# ------------------------------------------------------------------------------
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-*.env
-!.env.example
+# ── 2. Node.js & Frontend ────────────────────────────────────────────────────
+node_modules/
+.next/
+out/
+.swc/
+.eslintcache
+.cache-loader/
+.parcel-cache/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
 
-# ------------------------------------------------------------------------------
-# 4. IDE / Editor / OS Metadata
-# ------------------------------------------------------------------------------
+# ── 3. IDE, Editor & OS ──────────────────────────────────────────────────────
 .vscode/*
 !.vscode/extensions.json
 .idea/
@@ -72,115 +55,29 @@ pip-delete-this-directory.txt
 .DS_Store
 Thumbs.db
 Desktop.ini
-$RECYCLE.BIN/
 .Spotlight-V100/
 .Trashes/
-ehthumbs.db
+.openclaude-profile.json
 
-# ------------------------------------------------------------------------------
-# 5. Node.js & Frontend
-# ------------------------------------------------------------------------------
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-.next/
-out/
-.swc/
-.cache-loader/
-.eslintcache
-.parcel-cache/
+# ── 4. Secrets & Certificates ────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+*.csr
+*.p12
+*.pfx
 
-# ------------------------------------------------------------------------------
-# 6. Docker
-# ------------------------------------------------------------------------------
-.docker/
-docker-compose.override.yml
-*.sock
-
-# ------------------------------------------------------------------------------
-# 7. Terraform
-# ------------------------------------------------------------------------------
-.terraform/
-*.tfstate
-*.tfstate.*
-crash.log
-crash.*.log
-*.tfvars
-*.tfvars.json
-override.tf
-override.tf.json
-*_override.tf
-*_override.tf.json
-.terraformrc
-terraform.rc
-
-# ------------------------------------------------------------------------------
-# 8. Databases
-# ------------------------------------------------------------------------------
-*.sqlite
-*.sqlite3
-*.db
-*.db3
-*.s3db
-*.sl3
-dump.rdb
-appendonly.aof
-
-# ------------------------------------------------------------------------------
-# 9. Logs & Temporary Files
-# ------------------------------------------------------------------------------
-logs/*
-!logs/.gitkeep
-!logs/README.md
-*.log
-tmp/*
-!tmp/.gitkeep
-!tmp/README.md
-temp/*
-!temp/.gitkeep
-!temp/README.md
-*.tmp
-*.bak
-
-# ------------------------------------------------------------------------------
-# 9b. Runtime Uploads & Storage
-# ------------------------------------------------------------------------------
-uploads/*
-!uploads/.gitkeep
-!uploads/README.md
-storage/uploads/*
-!storage/uploads/.gitkeep
-!storage/uploads/README.md
-storage/temp/*
-!storage/temp/.gitkeep
-!storage/temp/README.md
-storage/cache/*
-!storage/cache/.gitkeep
-!storage/cache/README.md
-storage/quarantine/*
-!storage/quarantine/.gitkeep
-!storage/quarantine/README.md
-
-# ------------------------------------------------------------------------------
-# 10. Medical Datasets (DICOM/NIfTI)
-# ------------------------------------------------------------------------------
+# ── 5. Runtime Data ──────────────────────────────────────────────────────────
+# Datasets — only README.md is tracked
 datasets/*
-!datasets/.gitkeep
 !datasets/README.md
-*.dcm
-*.nii
-*.nii.gz
-*.mha
-*.mhd
-*.raw
-*.zraw
-*.nrrd
 
-# ------------------------------------------------------------------------------
-# 11. Trained Models & Checkpoints
-# ------------------------------------------------------------------------------
+# Trained models — only README.md is tracked
+models/*
+!models/README.md
 *.pt
 *.pth
 *.h5
@@ -196,114 +93,85 @@ datasets/*
 *.tflite
 *.mlmodel
 *.engine
-models/*
-!models/.gitkeep
-!models/README.md
 
+# Medical imaging files
+*.dcm
+*.nii
+*.nii.gz
+*.mha
+*.mhd
+*.raw
+*.zraw
+*.nrrd
 
-# ------------------------------------------------------------------------------
-# 12. Experiment Outputs & ML Artifacts
-# ------------------------------------------------------------------------------
-experiments/*
-!experiments/.gitkeep
-!experiments/README.md
-outputs/*
-!outputs/.gitkeep
-!outputs/README.md
-backend/outputs_val/*
-!backend/outputs_val/.gitkeep
-!backend/outputs_val/README.md
-test_robustness_output/*
-!test_robustness_output/.gitkeep
-!test_robustness_output/README.md
-test_xai_output/*
-!test_xai_output/.gitkeep
-!test_xai_output/README.md
-results/*
-!results/.gitkeep
-!results/README.md
-mlruns/*
-!mlruns/.gitkeep
-!mlruns/README.md
-mlartifacts/*
-!mlartifacts/.gitkeep
-!mlartifacts/README.md
+# Outputs, uploads, storage, temp
+/outputs/
+/backend/outputs_val/
+/results/
+/uploads/
+/storage/cache/
+/storage/quarantine/
+/storage/temp/
+/storage/uploads/
+/temp/
+/tmp/
+/generated/
+/openapi/
+/test_inference_output/
+/test_robustness_output/
+/test_xai_output/
+
+# ── 6. ML Tracking & Experiment Outputs ──────────────────────────────────────
+/experiments/
+/mlruns/
+/mlartifacts/
 mlflow.db
-ray_results/*
-!ray_results/.gitkeep
-!ray_results/README.md
-tb_logs/*
-!tb_logs/.gitkeep
-!tb_logs/README.md
-wandb/*
-!wandb/.gitkeep
-!wandb/README.md
-.wandb/*
-!.wandb/.gitkeep
-!.wandb/README.md
-tensorboard/*
-!tensorboard/.gitkeep
-!tensorboard/README.md
+/ray_results/
+/tb_logs/
+/tensorboard/
 *.tfevents.*
+/wandb/
+/.wandb/
+/visualizations/
+/reports/
 
-# ------------------------------------------------------------------------------
-# 13. Generated Reports & Visualizations
-# ------------------------------------------------------------------------------
-reports/*
-!reports/.gitkeep
-!reports/README.md
-visualizations/*
-!visualizations/.gitkeep
-!visualizations/README.md
+# ── 7. Logs ──────────────────────────────────────────────────────────────────
+/logs/
+*.log
+*.tmp
+*.bak
 
-# ------------------------------------------------------------------------------
-# 14. Local Configuration
-# ------------------------------------------------------------------------------
+# ── 8. Docker & Terraform ────────────────────────────────────────────────────
+.docker/
+docker-compose.override.yml
+*.sock
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+*.tfvars
+*.tfvars.json
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# ── 9. Databases & Local Config ──────────────────────────────────────────────
+*.sqlite
+*.sqlite3
+*.db
+*.db3
+dump.rdb
+appendonly.aof
 *.local.yml
 *.local.yaml
 *.local.json
-.openclaude-profile.json
-
-# ------------------------------------------------------------------------------
-# 15. Kubernetes Local Config
-# ------------------------------------------------------------------------------
 kubeconfig
 *.kubeconfig
-
-# ------------------------------------------------------------------------------
-# 16. Profiling
-# ------------------------------------------------------------------------------
 *.prof
 *.profraw
 *.profdata
-
-# ------------------------------------------------------------------------------
-# 17. Secrets & Certificates
-# ------------------------------------------------------------------------------
-*.pem
-*.key
-*.crt
-*.csr
-*.p12
-*.pfx
-
-# ------------------------------------------------------------------------------
-# 18. Generated API Clients
-# ------------------------------------------------------------------------------
-generated/*
-!generated/.gitkeep
-!generated/README.md
-openapi/*
-!openapi/.gitkeep
-!openapi/README.md
-
-# ------------------------------------------------------------------------------
-# 19. Explicitly Tracked Files
-# ------------------------------------------------------------------------------
-!uv.lock
-!pyproject.toml
-!.gitignore
-!.gitattributes
-!.editorconfig
-!.pre-commit-config.yaml
-!README.md
+create_structure.py

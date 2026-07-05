@@ -1,6 +1,10 @@
 """Health check endpoints for Kubernetes probes."""
 
-import redis.asyncio as redis
+try:
+    import redis.asyncio as redis
+    HAS_REDIS = True
+except ImportError:
+    HAS_REDIS = False
 from fastapi import APIRouter, Depends
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -36,10 +40,13 @@ async def readiness(db: Session = Depends(get_db)) -> dict:
 
     # 2. Redis Check
     try:
-        r = redis.from_url(settings.REDIS_URL, decode_responses=True)
-        await r.ping()
-        await r.aclose()
-        redis_ok = True
+        if HAS_REDIS:
+            r = redis.from_url(settings.REDIS_URL, decode_responses=True)
+            await r.ping()
+            await r.aclose()
+            redis_ok = True
+        else:
+            redis_ok = False
     except Exception:
         redis_ok = False
         

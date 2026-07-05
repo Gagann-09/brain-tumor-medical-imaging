@@ -1,0 +1,132 @@
+/* frontend/components/features/MRIViewer.module.css */
+.container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-primary-900); /* Dark background for medical images */
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  position: relative;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-4);
+  background-color: rgba(15, 23, 42, 0.85); /* Slightly transparent dark */
+  backdrop-filter: blur(4px);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-above);
+  border-bottom: 1px solid var(--color-primary-700);
+}
+
+.toolbarGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.iconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  color: var(--color-primary-300);
+  background: transparent;
+  border: 1px solid transparent;
+  transition: all var(--transition-fast);
+}
+
+.iconButton:hover {
+  background-color: var(--color-primary-700);
+  color: var(--color-primary-50);
+}
+
+.iconButton.active {
+  background-color: var(--color-primary-700);
+  color: var(--color-accent-500);
+  border-color: var(--color-accent-500);
+}
+
+.canvasContainer {
+  flex-grow: 1;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+}
+
+.canvasContainer:active {
+  cursor: grabbing;
+}
+
+.canvas {
+  /* Let canvas handle its own pixel dimensions, CSS handles placement */
+  transform-origin: center center;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* Layer Controls specific to explainability */
+.layerControls {
+  position: absolute;
+  right: var(--space-4);
+  top: 60px;
+  background-color: rgba(30, 41, 59, 0.9);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--color-primary-700);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  color: var(--color-primary-50);
+  z-index: var(--z-above);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 200px;
+}
+
+.layerControlHeader {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: var(--space-2);
+  color: var(--color-primary-100);
+}
+
+.layerItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  gap: var(--space-4);
+}
+
+.layerSlider {
+  width: 80px;
+  accent-color: var(--color-accent-500);
+}
+
+.metadata {
+  position: absolute;
+  bottom: var(--space-4);
+  left: var(--space-4);
+  color: var(--color-primary-300);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  pointer-events: none;
+  z-index: var(--z-above);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}

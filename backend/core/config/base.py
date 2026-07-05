@@ -56,6 +56,15 @@ class BaseConfig(BaseSettings):
     ALLOW_IMAGE_UPLOADS_FOR_DEV: bool = False
     AI_MODEL_VERSION: str = "v1.0.0"
 
+    # ── Upload & Inference Lifecycle Policies ─────────────
+    UPLOAD_TIMEOUT_SECONDS: int = 300
+    INFERENCE_TIMEOUT_SECONDS: int = 1200
+    ARTIFACT_GENERATION_TIMEOUT_SECONDS: int = 600
+    CLEANUP_TIMEOUT_SECONDS: int = 3600
+    UPLOAD_RETENTION_DAYS: int = 7
+    JOB_RETENTION_DAYS: int = 30
+    MAX_RETRIES: int = 3
+
     @model_validator(mode="after")
     def validate_config(self) -> "BaseConfig":
         """Centralized config validation."""
