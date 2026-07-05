@@ -31,6 +31,15 @@ htmlcov/
 .python-version
 venv/
 .venv/
+*.prof
+*.profraw
+*.profdata
+*.fingerprint
+*.cache
+.cache/
+.dataset_cache/
+.preprocessing_cache/
+.dataloader_cache/
 
 # ── 2. Node.js & Frontend ────────────────────────────────────────────────────
 node_modules/
@@ -70,14 +79,31 @@ Desktop.ini
 *.p12
 *.pfx
 
-# ── 5. Runtime Data ──────────────────────────────────────────────────────────
-# Datasets — only README.md is tracked
+# ── 5. Medical Data & Datasets ───────────────────────────────────────────────
 datasets/*
 !datasets/README.md
+/uploads/
+/storage/
+/temp/
+/tmp/
+/cache/
+/quarantine/
+/inference_cache/
+*.dcm
+*.nii
+*.nii.gz
+*.mha
+*.mhd
+*.raw
+*.zraw
+*.nrrd
 
-# Trained models — only README.md is tracked
+# ── 6. ML Models & Artifacts ─────────────────────────────────────────────────
 models/*
 !models/README.md
+/checkpoints/
+/best_models/
+/exports/
 *.pt
 *.pth
 *.h5
@@ -93,55 +119,69 @@ models/*
 *.tflite
 *.mlmodel
 *.engine
+*.weights
 
-# Medical imaging files
-*.dcm
-*.nii
-*.nii.gz
-*.mha
-*.mhd
-*.raw
-*.zraw
-*.nrrd
-
-# Outputs, uploads, storage, temp
+# ── 7. Training Runtime, Tracking & Logs ─────────────────────────────────────
 /outputs/
 /backend/outputs_val/
+/outputs_val/
 /results/
-/uploads/
-/storage/cache/
-/storage/quarantine/
-/storage/temp/
-/storage/uploads/
-/temp/
-/tmp/
-/generated/
-/openapi/
 /test_inference_output/
 /test_robustness_output/
 /test_xai_output/
-
-# ── 6. ML Tracking & Experiment Outputs ──────────────────────────────────────
 /experiments/
+/experiment_outputs/
+/benchmark_outputs/
+/comparison_outputs/
+/reports/generated/
+/generated/
+/openapi/
+/profiler/
+/profiling/
+/traces/
+/logs/
+/tensorboard/
+/tb_logs/
 /mlruns/
 /mlartifacts/
-mlflow.db
 /ray_results/
-/tb_logs/
-/tensorboard/
-*.tfevents.*
 /wandb/
 /.wandb/
 /visualizations/
-/reports/
-
-# ── 7. Logs ──────────────────────────────────────────────────────────────────
-/logs/
 *.log
 *.tmp
 *.bak
+mlflow.db
+*.tfevents.*
 
-# ── 8. Docker & Terraform ────────────────────────────────────────────────────
+# ── 8. Generated Experiment Files & Reports ──────────────────────────────────
+provenance.json
+metrics.json
+metrics.jsonl
+benchmark.json
+benchmark.csv
+benchmark.md
+model_card.json
+model_card.md
+model_card_*.md
+model_card_*.json
+dataset_health_report.md
+failure_analysis.md
+comparison_report.md
+*_health_report.json
+*_health_report.html
+*_comparison_report.json
+*_comparison_report.html
+*_validation_report.json
+*_validation_report.md
+*_validation_report.html
+*_benchmark_summary.csv
+*_benchmark_summary.json
+*overlay*.png
+*visualization*.png
+*_report.html
+
+# ── 9. Docker & Infrastructure ───────────────────────────────────────────────
 .docker/
 docker-compose.override.yml
 *.sock
@@ -159,7 +199,7 @@ override.tf.json
 .terraformrc
 terraform.rc
 
-# ── 9. Databases & Local Config ──────────────────────────────────────────────
+# ── 10. Databases & Local Config ─────────────────────────────────────────────
 *.sqlite
 *.sqlite3
 *.db
@@ -171,23 +211,4 @@ appendonly.aof
 *.local.json
 kubeconfig
 *.kubeconfig
-*.prof
-*.profraw
-*.profdata
 create_structure.py
-
-# ── 10. Dataset Registry & Training Caches ───────────────────────────────────
-*.fingerprint
-*.cache
-.cache/
-.dataset_cache/
-.preprocessing_cache/
-.dataloader_cache/
-*_health_report.json
-*_health_report.html
-*_comparison_report.json
-*_comparison_report.html
-model_card_*.md
-model_card_*.json
-*_benchmark_summary.csv
-*_benchmark_summary.json

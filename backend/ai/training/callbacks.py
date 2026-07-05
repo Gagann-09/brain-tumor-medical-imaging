@@ -159,9 +159,44 @@ class ModelCardCallback(Callback):
             model_details=self.model_details,
             training_config=self.config.model_dump() if hasattr(self.config, "model_dump") else {},
             metrics=self.best_metrics,
-            dataset_info={"dataset_name": getattr(self.config, "dataset", {}).get("name", "unknown")}
+            dataset_info={"dataset_name": getattr(getattr(self.config, "dataset", None), "registry_id", "unknown")}
         )
 
         card.save(self.save_dir / "model_card.json")
         card.export_markdown(self.save_dir / "model_card.md")
+
+class EarlyStoppingCallback(Callback):
+    """Early stopping to terminate training when validation metric stops improving."""
+    priority = 20
+
+    def __init__(self, patience: int = 5, monitor_metric: str = "val_loss", min_delta: float = 0.0, mode: str = "min"):
+        self.patience = patience
+        self.monitor_metric = monitor_metric
+        self.min_delta = min_delta
+        self.mode = mode
+        self.best_metric = float("inf") if mode == "min" else float("-inf")
+        self.wait = 0
+
+    def on_evaluation_end(self, event: Event) -> None:
+        metrics = event.data.get("metrics", {})
+        val_metric = metrics.get(self.monitor_metric)
+        if val_metric is None:
+            return
+
+        improved = False
+        if self.mode == "min":
+            if val_metric < self.best_metric - self.min_delta:
+                improved = True
+        else:
+            if val_metric > self.best_metric + self.min_delta:
+                improved = True
+
+        if improved:
+            self.best_metric = val_metric
+            self.wait = 0
+        else:
+            self.wait += 1
+            if self.wait >= self.patience:
+                event.data["stop_training"] = True
+                print(f"Early stopping triggered. Metric '{self.monitor_metric}' did not improve for {self.patience} epochs.")
 

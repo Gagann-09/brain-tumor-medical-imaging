@@ -3,7 +3,8 @@ from typing import Any, Optional
 
 from pydantic import BaseModel, Field
 
-from core.config import settings
+from core.config import get_settings
+settings = get_settings()
 
 class DatasetProfileName(str, Enum):
     DEVELOPMENT = "development"

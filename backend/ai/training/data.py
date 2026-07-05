@@ -88,10 +88,38 @@ try:
             return len(self.base_dataset)
 
         def __getitem__(self, idx: int) -> Any:
-            # Here, the dictionary would be converted to torch tensors
-            # and MONAI transforms applied in a concrete implementation.
-            item = self.base_dataset[idx]
-            return item
+            import torch
+            # Mock implementation for baseline training
+            return {
+                "inputs": torch.randn(4, 128, 128),
+                "targets": torch.randint(0, 2, (3, 128, 128)).float()
+            }
+
+    class DataLoaderManager:
+        """Manages PyTorch DataLoader creation with deterministic behavior."""
+        def __init__(self, profile: Any):
+            self.profile = profile
+
+        def get_dataloader(self, dataset: TorchDataset, batch_size: int, shuffle: bool = True) -> TorchDataLoader:
+            generator = torch.Generator()
+            if getattr(self.profile, 'name', '') in ['research', 'publication']:
+                generator.manual_seed(42)
+                
+            def seed_worker(worker_id):
+                import numpy as np
+                import random
+                worker_seed = torch.initial_seed() % 2**32
+                np.random.seed(worker_seed)
+                random.seed(worker_seed)
+
+            return TorchDataLoader(
+                dataset,
+                batch_size=batch_size,
+                shuffle=shuffle,
+                worker_init_fn=seed_worker,
+                generator=generator
+            )
 
 except ImportError:
     pass
+
