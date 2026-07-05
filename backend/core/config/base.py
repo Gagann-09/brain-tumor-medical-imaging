@@ -45,6 +45,11 @@ class BaseConfig(BaseSettings):
     S3_ACCESS_KEY_ID: str = ""
     S3_SECRET_ACCESS_KEY: str = ""
 
+    # ── Datasets ─────────────────────────────────────────
+    BRA_TS_DEV_PATH: str = "./datasets/brats_2020_subset"
+    BRA_TS_FULL_PATH: str = "./datasets/brats_2020_full"
+    KAGGLE_DATASET_PATH: str = "./datasets/kaggle_brain_mri"
+
     # ── Rate Limiting ────────────────────────────────────
     RATE_LIMIT_GLOBAL: str = "100/minute"
     RATE_LIMIT_UPLOAD: str = "10/minute"

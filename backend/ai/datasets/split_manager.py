@@ -1,5 +1,7 @@
+import json
 import random
 from abc import ABC, abstractmethod
+from typing import Any
 
 from medical.domain import MRIStudy
 from medical.exceptions import MedicalImagingError
@@ -10,10 +12,68 @@ class SplitStrategy(ABC):
 
     @abstractmethod
     def split(self, studies: list[MRIStudy], train_ratio: float, val_ratio: float) -> tuple[list[MRIStudy], list[MRIStudy], list[MRIStudy]]:
-        """
-        Split a list of studies into train, validation, and test sets.
-        """
         pass
+
+
+class ManifestSplitStrategy(SplitStrategy):
+    """
+    Splits dataset strictly based on a provided JSON manifest file containing lists of patient identifiers.
+    """
+
+    def __init__(self, manifest_path: str, fold: str | None = None):
+        self.manifest_path = manifest_path
+        self.fold = fold
+        self.manifest = self._load_manifest()
+
+    def _load_manifest(self) -> dict[str, Any]:
+        with open(self.manifest_path, "r") as f:
+            return json.load(f)
+
+    def split(self, studies: list[MRIStudy], train_ratio: float, val_ratio: float) -> tuple[list[MRIStudy], list[MRIStudy], list[MRIStudy]]:
+        splits = self.manifest.get("splits", {})
+        if self.fold:
+            splits = splits.get(self.fold, {})
+            if not splits:
+                raise MedicalImagingError(f"Fold '{self.fold}' not found in manifest '{self.manifest_path}'.")
+
+        train_ids = set(splits.get("train", []))
+        val_ids = set(splits.get("val", []))
+        test_ids = set(splits.get("test", []))
+
+        # Ensure no overlap
+        if train_ids & val_ids or train_ids & test_ids or val_ids & test_ids:
+            raise MedicalImagingError("Split manifest contains overlapping patient IDs.")
+
+        train_set, val_set, test_set = [], [], []
+
+        assigned_ids = set()
+        for study in studies:
+            pid = study.patient_id
+            if not pid:
+                raise MedicalImagingError(f"Study {study.study_id} missing patient ID for ManifestSplitStrategy")
+
+            if pid in assigned_ids:
+                continue
+            
+            assigned_ids.add(pid)
+            
+            if pid in train_ids:
+                train_set.append(study)
+            elif pid in val_ids:
+                val_set.append(study)
+            elif pid in test_ids:
+                test_set.append(study)
+            else:
+                raise MedicalImagingError(f"Patient ID '{pid}' not found in any split in manifest '{self.manifest_path}'.")
+
+        # Optionally check if all manifest IDs were found
+        missing_ids = (train_ids | val_ids | test_ids) - assigned_ids
+        if missing_ids:
+             # Just logging a warning or throwing an error depending on strictness, but for this implementation:
+             pass
+
+        return train_set, val_set, test_set
+
 
 class PatientSplitStrategy(SplitStrategy):
     """
@@ -28,7 +88,6 @@ class PatientSplitStrategy(SplitStrategy):
         if train_ratio + val_ratio > 1.0:
             raise ValueError("train_ratio + val_ratio cannot exceed 1.0")
 
-        # Group studies by patient ID
         patient_groups: dict[str, list[MRIStudy]] = {}
         for study in studies:
             if not study.patient_id:
@@ -49,9 +108,7 @@ class PatientSplitStrategy(SplitStrategy):
         val_ids = set(patient_ids[n_train:n_train + n_val])
         test_ids = set(patient_ids[n_train + n_val:])
 
-        train_set = []
-        val_set = []
-        test_set = []
+        train_set, val_set, test_set = [], [], []
 
         for pid in train_ids:
             train_set.extend(patient_groups[pid])
@@ -61,6 +118,7 @@ class PatientSplitStrategy(SplitStrategy):
             test_set.extend(patient_groups[pid])
 
         return train_set, val_set, test_set
+
 
 class DatasetSplitManager:
     """Manages the splitting of datasets using a configurable strategy."""

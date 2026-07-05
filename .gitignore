@@ -175,3 +175,19 @@ kubeconfig
 *.profraw
 *.profdata
 create_structure.py
+
+# ── 10. Dataset Registry & Training Caches ───────────────────────────────────
+*.fingerprint
+*.cache
+.cache/
+.dataset_cache/
+.preprocessing_cache/
+.dataloader_cache/
+*_health_report.json
+*_health_report.html
+*_comparison_report.json
+*_comparison_report.html
+model_card_*.md
+model_card_*.json
+*_benchmark_summary.csv
+*_benchmark_summary.json

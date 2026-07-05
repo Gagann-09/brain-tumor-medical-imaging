@@ -1,0 +1,13 @@
+{
+  "dataset_name": "Kaggle Brain MRI",
+  "dataset_version": "latest",
+  "expected_case_count": null,
+  "expected_modalities": ["T1", "T1ce", "T2", "FLAIR"],
+  "supported_formats": [".jpg", ".png", ".nii", ".nii.gz"],
+  "supported_tasks": ["classification", "external_validation"],
+  "preprocessing_profile": "kaggle_standard",
+  "label_mapping_version": "v1",
+  "allow_case_count_warning": true,
+  "is_production_dataset": false,
+  "strict_validation": false
+}

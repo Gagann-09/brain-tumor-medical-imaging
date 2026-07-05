@@ -1,0 +1,52 @@
+{
+  "datasets": [
+    {
+      "dataset_identifier": "brats20_dev_v1",
+      "dataset_name": "BraTS 2020",
+      "dataset_version": "1.0",
+      "dataset_profile": "development",
+      "dataset_path": "data/brats20_dev",
+      "dataset_fingerprint": "",
+      "fingerprint_mode": "fast",
+      "split_manifest": "backend/ai/datasets/splits/development/brats_dev_split.json",
+      "preprocessing_profile": "standard_mri",
+      "label_mapping_version": "v1",
+      "supported_tasks": ["segmentation"],
+      "execution_profile": "development",
+      "created_at": "2026-07-06T00:00:00Z",
+      "last_verified": ""
+    },
+    {
+      "dataset_identifier": "brats20_research_v1",
+      "dataset_name": "BraTS 2020",
+      "dataset_version": "1.0",
+      "dataset_profile": "research",
+      "dataset_path": "data/brats20_full",
+      "dataset_fingerprint": "",
+      "fingerprint_mode": "full",
+      "split_manifest": "backend/ai/datasets/splits/research/brats_cv_split.json",
+      "preprocessing_profile": "standard_mri",
+      "label_mapping_version": "v1",
+      "supported_tasks": ["segmentation"],
+      "execution_profile": "research",
+      "created_at": "2026-07-06T00:00:00Z",
+      "last_verified": ""
+    },
+    {
+      "dataset_identifier": "kaggle_v1",
+      "dataset_name": "Kaggle Brain MRI",
+      "dataset_version": "1.0",
+      "dataset_profile": "external_validation",
+      "dataset_path": "data/kaggle",
+      "dataset_fingerprint": "",
+      "fingerprint_mode": "fast",
+      "split_manifest": "backend/ai/datasets/splits/external/kaggle_split.json",
+      "preprocessing_profile": "classification_mri",
+      "label_mapping_version": "v1",
+      "supported_tasks": ["classification"],
+      "execution_profile": "production_validation",
+      "created_at": "2026-07-06T00:00:00Z",
+      "last_verified": ""
+    }
+  ]
+}

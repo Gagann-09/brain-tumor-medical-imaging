@@ -1,0 +1,13 @@
+{
+  "dataset_name": "BraTS 2020 (Dev Subset)",
+  "dataset_version": "2020",
+  "expected_case_count": 65,
+  "expected_modalities": ["FLAIR", "T1", "T1ce", "T2", "SEG"],
+  "supported_formats": [".nii", ".nii.gz"],
+  "supported_tasks": ["segmentation"],
+  "preprocessing_profile": "brats_standard",
+  "label_mapping_version": "v1",
+  "allow_case_count_warning": true,
+  "is_production_dataset": false,
+  "strict_validation": false
+}

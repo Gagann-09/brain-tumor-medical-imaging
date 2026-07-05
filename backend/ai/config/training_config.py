@@ -47,8 +47,7 @@ class ModelConfig(BaseModel):
     kwargs: dict[str, Any] = Field(default_factory=dict, description="Model-specific hyperparameters")
 
 class DatasetConfig(BaseModel):
-    name: str = Field(..., description="Name of the dataset")
-    data_dir: str = Field(..., description="Path to the dataset directory")
+    registry_id: str = Field(default="brats20_dev_v1", description="Unique identifier for the dataset in the registry")
     batch_size: int = Field(16, description="Batch size per device")
     kwargs: dict[str, Any] = Field(default_factory=dict, description="Dataset-specific arguments")
 

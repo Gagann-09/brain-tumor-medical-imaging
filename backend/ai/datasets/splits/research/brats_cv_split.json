@@ -1,0 +1,11 @@
+{
+  "version": "1.0",
+  "dataset": "BraTS 2020 (Full)",
+  "folds": 5,
+  "splits": {
+    "fold_0": {
+      "train": ["BraTS20_Training_001"],
+      "val": ["BraTS20_Training_002"]
+    }
+  }
+}

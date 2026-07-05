@@ -1,0 +1,18 @@
+{
+  "version": "1.0",
+  "dataset": "Kaggle Brain MRI",
+  "splits": {
+    "train": [
+      "tumor/image1.jpg", "tumor/image2.jpg", "tumor/image3.jpg",
+      "normal/image1.jpg", "normal/image2.jpg", "normal/image3.jpg"
+    ],
+    "val": [
+      "tumor/image4.jpg",
+      "normal/image4.jpg"
+    ],
+    "test": [
+      "tumor/image5.jpg",
+      "normal/image5.jpg"
+    ]
+  }
+}
