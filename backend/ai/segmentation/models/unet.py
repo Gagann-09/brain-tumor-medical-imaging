@@ -29,7 +29,7 @@ class UNetBaseline(BaseSegmentationModel):
             channels=(16, 32, 64, 128, 256),
             strides=(2, 2, 2, 2),
             num_res_units=2,
-            **self.kwargs
+            **self.kwargs,
         )
         self.loss_function = DiceLoss(to_onehot_y=False, sigmoid=True)
         self.metric_function = DiceMetric(include_background=False, reduction="mean")
@@ -46,11 +46,7 @@ class UNetBaseline(BaseSegmentationModel):
 
         # Optionally compute metrics during training, but often skipped for speed.
         # We'll just return loss here.
-        return TrainingOutput(
-            loss=loss,
-            metrics={"train_loss": loss.item()},
-            predictions=outputs
-        )
+        return TrainingOutput(loss=loss, metrics={"train_loss": loss.item()}, predictions=outputs)
 
     def validation_step(self, batch: dict[str, torch.Tensor], batch_idx: int) -> ValidationOutput:
         inputs = batch["image"]
@@ -61,9 +57,7 @@ class UNetBaseline(BaseSegmentationModel):
         metrics = self.compute_metrics(outputs, targets)
 
         return ValidationOutput(
-            loss=loss.item(),
-            metrics={"val_loss": loss.item(), **metrics},
-            predictions=outputs
+            loss=loss.item(), metrics={"val_loss": loss.item(), **metrics}, predictions=outputs
         )
 
     def prediction_step(self, batch: dict[str, torch.Tensor], batch_idx: int) -> PredictionResult:

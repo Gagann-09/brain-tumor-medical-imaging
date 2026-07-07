@@ -16,11 +16,13 @@ class SeedManager:
 
         try:
             import torch
+
             torch.manual_seed(seed)
             if torch.cuda.is_available():
                 torch.cuda.manual_seed_all(seed)
         except ImportError:
             pass
+
 
 class MixedPrecisionManager(ABC):
     """Abstract interface for mixed precision training."""
@@ -40,6 +42,7 @@ class MixedPrecisionManager(ABC):
         """Step the optimizer with unscaled gradients."""
         pass
 
+
 class DistributedStrategy(ABC):
     """Abstract interface for handling multi-GPU or multi-node training."""
 
@@ -58,6 +61,7 @@ class DistributedStrategy(ABC):
     @abstractmethod
     def prepare_dataloader(self, dataloader: Any) -> Any:
         pass
+
 
 class MultiOptimizerManager:
     """Manages multiple optimizers (e.g. generator and discriminator) by logical name."""
@@ -92,10 +96,13 @@ class MultiOptimizerManager:
             if name in self.optimizers:
                 self.optimizers[name].load_state_dict(state)
 
+
 class AdversarialLossManager:
     """Manages composable weighted generator and discriminator loss components."""
 
-    def __init__(self, g_losses: dict[str, tuple[Any, float]], d_losses: dict[str, tuple[Any, float]]):
+    def __init__(
+        self, g_losses: dict[str, tuple[Any, float]], d_losses: dict[str, tuple[Any, float]]
+    ):
         """
         Args:
             g_losses: Dict mapping loss name to a tuple (loss_function, weight).

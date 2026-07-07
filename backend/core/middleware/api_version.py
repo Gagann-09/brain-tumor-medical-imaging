@@ -2,7 +2,9 @@
 
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
+
 from core.config import get_settings
+
 
 class APIVersionMiddleware(BaseHTTPMiddleware):
     """Injects X-API-Version header into responses."""

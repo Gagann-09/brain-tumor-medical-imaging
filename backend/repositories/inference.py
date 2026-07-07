@@ -1,8 +1,9 @@
-from sqlalchemy.orm import Session
 from sqlalchemy import select
-from typing import Optional, List
+from sqlalchemy.orm import Session
+
 from models.inference import InferenceJobModel
-from schemas.inference import InferenceJob, JobState
+from schemas.inference import InferenceJob
+
 
 class InferenceRepository:
     def __init__(self, db: Session):
@@ -17,27 +18,37 @@ class InferenceRepository:
             study_metadata=job_data.study_metadata,
             model_versions=job_data.model_versions,
             progress=job_data.progress,
-            api_version=job_data.api_version
+            api_version=job_data.api_version,
         )
         self.db.add(db_job)
         self.db.commit()
         self.db.refresh(db_job)
         return db_job
 
-    def get_by_job_id(self, job_id: str) -> Optional[InferenceJobModel]:
-        return self.db.execute(select(InferenceJobModel).where(InferenceJobModel.job_id == job_id)).scalars().first()
+    def get_by_job_id(self, job_id: str) -> InferenceJobModel | None:
+        return (
+            self.db.execute(select(InferenceJobModel).where(InferenceJobModel.job_id == job_id))
+            .scalars()
+            .first()
+        )
 
-    def get_by_idempotency_key(self, user_id: str, idempotency_key: str) -> Optional[InferenceJobModel]:
+    def get_by_idempotency_key(
+        self, user_id: str, idempotency_key: str
+    ) -> InferenceJobModel | None:
         if not user_id or not idempotency_key:
             return None
-        return self.db.execute(
-            select(InferenceJobModel).where(
-                InferenceJobModel.user_id == user_id, 
-                InferenceJobModel.idempotency_key == idempotency_key
+        return (
+            self.db.execute(
+                select(InferenceJobModel).where(
+                    InferenceJobModel.user_id == user_id,
+                    InferenceJobModel.idempotency_key == idempotency_key,
+                )
             )
-        ).scalars().first()
+            .scalars()
+            .first()
+        )
 
-    def update(self, job_id: str, update_data: dict) -> Optional[InferenceJobModel]:
+    def update(self, job_id: str, update_data: dict) -> InferenceJobModel | None:
         db_job = self.get_by_job_id(job_id)
         if db_job:
             for key, value in update_data.items():

@@ -22,6 +22,7 @@ def create_armt_generator(in_channels: int = 4, out_channels: int = 1) -> nn.Mod
         num_res_units=2,
     )
 
+
 @GANComponentRegistry.register_discriminator("patch_gan_3d")
 def create_patch_discriminator(in_channels: int = 5) -> nn.Module:
     # 4 image channels + 1 mask channel = 5
@@ -31,6 +32,7 @@ def create_patch_discriminator(in_channels: int = 5) -> nn.Module:
         num_layers_d=3,
         channels=32,
     )
+
 
 class ARMTGANModel(BaseGAN):
     """
@@ -46,8 +48,12 @@ class ARMTGANModel(BaseGAN):
     def build(self) -> None:
         in_c = self.kwargs.get("in_channels", 4)
         out_c = self.kwargs.get("out_channels", 1)
-        self.generator = GANComponentRegistry.get_generator("armt_unet", in_channels=in_c, out_channels=out_c)
-        self.discriminator = GANComponentRegistry.get_discriminator("patch_gan_3d", in_channels=in_c + out_c)
+        self.generator = GANComponentRegistry.get_generator(
+            "armt_unet", in_channels=in_c, out_channels=out_c
+        )
+        self.discriminator = GANComponentRegistry.get_discriminator(
+            "patch_gan_3d", in_channels=in_c + out_c
+        )
 
     def forward(self, inputs: torch.Tensor, **kwargs: Any) -> torch.Tensor:
         # Forward pass through generator for inference
@@ -66,15 +72,11 @@ class ARMTGANModel(BaseGAN):
 
         # 3. Compute loss
         loss, components = self.loss_manager.compute_generator_loss(
-            fake_preds=fake_preds,
-            fake_masks=fake_masks,
-            real_masks=targets
+            fake_preds=fake_preds, fake_masks=fake_masks, real_masks=targets
         )
 
         return TrainingOutput(
-            loss=loss,
-            metrics={"g_loss": loss.item(), **components},
-            predictions=fake_masks
+            loss=loss, metrics={"g_loss": loss.item(), **components}, predictions=fake_masks
         )
 
     def discriminator_step(self, batch: dict[str, torch.Tensor], batch_idx: int) -> TrainingOutput:
@@ -94,14 +96,10 @@ class ARMTGANModel(BaseGAN):
 
         # 3. Compute loss
         loss, components = self.loss_manager.compute_discriminator_loss(
-            real_preds=real_preds,
-            fake_preds=fake_preds
+            real_preds=real_preds, fake_preds=fake_preds
         )
 
-        return TrainingOutput(
-            loss=loss,
-            metrics={"d_loss": loss.item(), **components}
-        )
+        return TrainingOutput(loss=loss, metrics={"d_loss": loss.item(), **components})
 
     def validation_step(self, batch: dict[str, torch.Tensor], batch_idx: int) -> ValidationOutput:
         images = batch["image"]
@@ -110,10 +108,10 @@ class ARMTGANModel(BaseGAN):
         fake_masks = self.generator(images)
 
         # For validation, we typically just care about generator loss or segmentation metrics
-        loss, components = self.loss_manager.compute_generator_loss(
+        loss, _components = self.loss_manager.compute_generator_loss(
             fake_preds=self.discriminator(torch.cat([images, fake_masks], dim=1)),
             fake_masks=fake_masks,
-            real_masks=targets
+            real_masks=targets,
         )
 
         # Compute val dice roughly
@@ -122,7 +120,7 @@ class ARMTGANModel(BaseGAN):
         return ValidationOutput(
             loss=loss.item(),
             metrics={"val_loss": loss.item(), "val_dice": dice.item()},
-            predictions=fake_masks
+            predictions=fake_masks,
         )
 
     def prediction_step(self, batch: dict[str, torch.Tensor], batch_idx: int) -> PredictionResult:

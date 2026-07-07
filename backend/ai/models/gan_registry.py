@@ -5,17 +5,18 @@ from typing import Any
 class GANComponentRegistry:
     """Registry for GAN components: generators, discriminators, losses, metrics, etc."""
 
-    _generators: dict[str, Callable[..., Any]] = {}
-    _discriminators: dict[str, Callable[..., Any]] = {}
-    _losses: dict[str, Callable[..., Any]] = {}
-    _metrics: dict[str, Callable[..., Any]] = {}
-    _regularizers: dict[str, Callable[..., Any]] = {}
+    _generators: dict[str, Callable[..., Any]] = {}  # type: ignore  # type: ignore
+    _discriminators: dict[str, Callable[..., Any]] = {}  # type: ignore  # type: ignore
+    _losses: dict[str, Callable[..., Any]] = {}  # type: ignore  # type: ignore
+    _metrics: dict[str, Callable[..., Any]] = {}  # type: ignore  # type: ignore
+    _regularizers: dict[str, Callable[..., Any]] = {}  # type: ignore  # type: ignore
 
     @classmethod
     def register_generator(cls, name: str) -> Callable:
         def decorator(factory: Callable[..., Any]) -> Callable:
             cls._generators[name] = factory
             return factory
+
         return decorator
 
     @classmethod
@@ -23,6 +24,7 @@ class GANComponentRegistry:
         def decorator(factory: Callable[..., Any]) -> Callable:
             cls._discriminators[name] = factory
             return factory
+
         return decorator
 
     @classmethod
@@ -30,6 +32,7 @@ class GANComponentRegistry:
         def decorator(factory: Callable[..., Any]) -> Callable:
             cls._losses[name] = factory
             return factory
+
         return decorator
 
     @classmethod
@@ -37,6 +40,7 @@ class GANComponentRegistry:
         def decorator(factory: Callable[..., Any]) -> Callable:
             cls._metrics[name] = factory
             return factory
+
         return decorator
 
     @classmethod
@@ -44,6 +48,7 @@ class GANComponentRegistry:
         def decorator(factory: Callable[..., Any]) -> Callable:
             cls._regularizers[name] = factory
             return factory
+
         return decorator
 
     @classmethod

@@ -1,4 +1,4 @@
-from typing import List
+
 
 from medical.domain import MRIImage
 from medical.exceptions import MedicalImagingError
@@ -6,7 +6,9 @@ from medical.exceptions import MedicalImagingError
 
 class ImageValidationError(MedicalImagingError):
     """Exception raised for validation errors on MRIImage objects."""
+
     pass
+
 
 def validate_mri_image(image: MRIImage) -> bool:
     """
@@ -25,10 +27,11 @@ def validate_mri_image(image: MRIImage) -> bool:
 
     return True
 
+
 def validate_multi_modal_consistency(images: list[MRIImage]) -> bool:
     """
     Validate that multiple MRIImage objects (e.g. from different series but same study)
-    can be combined or compared. They should typically have the same shape/affine 
+    can be combined or compared. They should typically have the same shape/affine
     if they are pre-registered, but for raw data this might not be true.
     """
     if not images:

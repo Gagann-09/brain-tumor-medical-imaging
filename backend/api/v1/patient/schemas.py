@@ -8,6 +8,7 @@ from pydantic import BaseModel
 
 class PatientCreate(BaseModel):
     """Create a new patient record."""
+
     medical_record_number: str
     full_name: str
     date_of_birth: date | None = None
@@ -18,6 +19,7 @@ class PatientCreate(BaseModel):
 
 class PatientUpdate(BaseModel):
     """Partial update for a patient record."""
+
     full_name: str | None = None
     date_of_birth: date | None = None
     gender: str | None = None
@@ -27,6 +29,7 @@ class PatientUpdate(BaseModel):
 
 class PatientResponse(BaseModel):
     """Patient representation."""
+
     id: UUID
     medical_record_number: str
     full_name: str

@@ -1,4 +1,5 @@
 """Metrics registry."""
+
 from collections.abc import Callable
 from typing import Any
 
@@ -6,7 +7,7 @@ from typing import Any
 class MetricsRegistry:
     """Central registry for evaluation metrics."""
 
-    _metrics: dict[str, Callable] = {}
+    _metrics: dict[str, Callable] = {}  # type: ignore  # type: ignore
 
     @classmethod
     def register(cls, name: str, metric_func: Callable) -> None:

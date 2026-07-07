@@ -15,6 +15,7 @@ class ModelCardConfig(BaseModel):
     preprocessing_requirements: list[str] = Field(default_factory=list)
     author: str = "AI Team"
 
+
 class ModelCard(BaseModel):
     """Automatically generated documentation for trained models."""
 
@@ -27,10 +28,10 @@ class ModelCard(BaseModel):
     benchmark_summary: dict[str, Any] = Field(default_factory=dict)
     experiment_health_score: float = 0.0
     generalization_report_ref: str = ""
-    
+
     software_versions: dict[str, str] = Field(default_factory=dict)
     hardware_information: str = "unknown"
-    
+
     timestamp: datetime = Field(default_factory=datetime.utcnow)
     git_hash: str = "unknown"
 
@@ -48,7 +49,7 @@ class ModelCard(BaseModel):
 
         md += "## Description\n"
         md += f"{self.model_details.description}\n\n"
-        
+
         md += "## Experiment Health\n"
         md += f"- **Health Score**: {self.experiment_health_score:.2f}\n"
         if self.generalization_report_ref:
@@ -71,12 +72,12 @@ class ModelCard(BaseModel):
         for lim in self.model_details.limitations:
             md += f"- {lim}\n"
         md += "\n"
-        
+
         md += "## Preprocessing Requirements\n"
         for req in self.model_details.preprocessing_requirements:
             md += f"- {req}\n"
         md += "\n"
-        
+
         md += "## Environment\n"
         md += f"**Hardware:** {self.hardware_information}\n"
         for k, v in self.software_versions.items():

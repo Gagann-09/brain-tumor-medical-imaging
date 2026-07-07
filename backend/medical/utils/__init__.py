@@ -11,6 +11,7 @@ def normalize_min_max(volume: np.ndarray) -> np.ndarray:
         return np.zeros_like(volume, dtype=np.float32)
     return (volume - min_val) / (max_val - min_val)
 
+
 def normalize_z_score(volume: np.ndarray) -> np.ndarray:
     """
     Normalize a volume using Z-score (zero mean, unit variance).
@@ -20,6 +21,7 @@ def normalize_z_score(volume: np.ndarray) -> np.ndarray:
     if std == 0:
         return np.zeros_like(volume, dtype=np.float32)
     return (volume - mean) / std
+
 
 def crop_to_non_zero(volume: np.ndarray) -> np.ndarray:
     """
@@ -32,5 +34,7 @@ def crop_to_non_zero(volume: np.ndarray) -> np.ndarray:
     min_indices = [np.min(idx) for idx in non_zero_indices]
     max_indices = [np.max(idx) for idx in non_zero_indices]
 
-    slices = tuple(slice(min_idx, max_idx + 1) for min_idx, max_idx in zip(min_indices, max_indices))
+    slices = tuple(
+        slice(min_idx, max_idx + 1) for min_idx, max_idx in zip(min_indices, max_indices, strict=False)
+    )
     return volume[slices]

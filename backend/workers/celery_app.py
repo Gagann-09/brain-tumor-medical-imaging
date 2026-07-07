@@ -1,7 +1,9 @@
 """Celery application initialization."""
 
 import os
+
 from celery import Celery
+
 from core.config import get_settings
 
 settings = get_settings()
@@ -10,7 +12,7 @@ celery_app = Celery(
     "armt_gan_workers",
     broker=settings.REDIS_URL,
     backend=settings.REDIS_URL,
-    include=["workers.tasks.audit_tasks"]
+    include=["workers.tasks.audit_tasks"],
 )
 
 celery_app.conf.update(

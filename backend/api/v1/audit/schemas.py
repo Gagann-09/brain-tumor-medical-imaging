@@ -8,11 +8,13 @@ from pydantic import BaseModel
 
 class AuditCreate(BaseModel):
     """Request to create a audit."""
+
     pass
 
 
 class AuditResponse(BaseModel):
     """Response for audit data."""
+
     id: UUID
     user_id: UUID | None = None
     action: str

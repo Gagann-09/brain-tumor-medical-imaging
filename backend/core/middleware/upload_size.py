@@ -7,6 +7,7 @@ from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoin
 
 logger = structlog.get_logger()
 
+
 class UploadSizeLimitMiddleware(BaseHTTPMiddleware):
     """Limits the size of incoming requests (especially uploads)."""
 
@@ -19,9 +20,16 @@ class UploadSizeLimitMiddleware(BaseHTTPMiddleware):
         if request.method in ["POST", "PUT"]:
             content_length = request.headers.get("Content-Length")
             if content_length and int(content_length) > self.max_upload_size:
-                logger.warning("upload_size_limit_exceeded", size=content_length, limit=self.max_upload_size)
+                logger.warning(
+                    "upload_size_limit_exceeded", size=content_length, limit=self.max_upload_size
+                )
                 return JSONResponse(
                     status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-                    content={"error": {"type": "PayloadTooLarge", "message": "Request body exceeds maximum allowed size"}}
+                    content={
+                        "error": {
+                            "type": "PayloadTooLarge",
+                            "message": "Request body exceeds maximum allowed size",
+                        }
+                    },
                 )
         return await call_next(request)

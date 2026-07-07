@@ -11,6 +11,7 @@ class BaseEngine(ABC):
         self.model = model
         self.event_bus = event_bus
 
+
 class TrainingEngine(BaseEngine):
     """Handles the core training loop for a single epoch."""
 
@@ -33,7 +34,9 @@ class TrainingEngine(BaseEngine):
         num_batches = 0
 
         for batch_idx, batch in enumerate(dataloader):
-            self.event_bus.publish(Event(EventType.BATCH_START, {"batch": batch_idx, "mode": "train"}))
+            self.event_bus.publish(
+                Event(EventType.BATCH_START, {"batch": batch_idx, "mode": "train"})
+            )
 
             # Delegate step execution to strategy (handles mixed precision, backward, step)
             step_metrics = self.strategy.execute_step(self.model, batch, batch_idx)
@@ -43,13 +46,26 @@ class TrainingEngine(BaseEngine):
             epoch_loss += loss_val
             num_batches += 1
 
-            self.event_bus.publish(Event(EventType.BATCH_END, {"batch": batch_idx, "mode": "train", "loss": loss_val, "metrics": step_metrics}))
+            self.event_bus.publish(
+                Event(
+                    EventType.BATCH_END,
+                    {
+                        "batch": batch_idx,
+                        "mode": "train",
+                        "loss": loss_val,
+                        "metrics": step_metrics,
+                    },
+                )
+            )
 
         avg_loss = epoch_loss / max(1, num_batches)
         metrics = {"loss": avg_loss}
 
-        self.event_bus.publish(Event(EventType.EPOCH_END, {"epoch": epoch_idx, "mode": "train", "metrics": metrics}))
+        self.event_bus.publish(
+            Event(EventType.EPOCH_END, {"epoch": epoch_idx, "mode": "train", "metrics": metrics})
+        )
         return metrics
+
 
 class EvaluationEngine(BaseEngine):
     """Handles the evaluation loop."""
@@ -71,6 +87,7 @@ class EvaluationEngine(BaseEngine):
         all_metrics = {}
 
         import torch
+
         with torch.no_grad():
             for batch_idx, batch in enumerate(dataloader):
                 output = self.model.validation_step(batch, batch_idx)
@@ -85,6 +102,7 @@ class EvaluationEngine(BaseEngine):
         self.event_bus.publish(Event(EventType.EVALUATION_END, {"mode": "val", "metrics": metrics}))
         return metrics
 
+
 class PredictionEngine(BaseEngine):
     """Handles inference/prediction."""
 
@@ -94,6 +112,7 @@ class PredictionEngine(BaseEngine):
 
         predictions = []
         import torch
+
         with torch.no_grad():
             for batch_idx, batch in enumerate(dataloader):
                 output = self.model.prediction_step(batch, batch_idx)

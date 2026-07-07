@@ -5,9 +5,4 @@ from .interfaces import (
     SignalToNoiseRatio,
 )
 
-__all__ = [
-    "ContrastToNoiseRatio",
-    "QualityAssessmentEngine",
-    "QualityMetric",
-    "SignalToNoiseRatio"
-]
+__all__ = ["ContrastToNoiseRatio", "QualityAssessmentEngine", "QualityMetric", "SignalToNoiseRatio"]

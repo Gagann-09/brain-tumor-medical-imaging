@@ -2,12 +2,12 @@
 
 import uuid
 
-from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, String, Text, Index
+from sqlalchemy import Column, DateTime, Float, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 
 from .base import Base
-from .mixins import SoftDeleteMixin, OptimisticLockingMixin
+from .mixins import OptimisticLockingMixin, SoftDeleteMixin
 
 
 class Prediction(SoftDeleteMixin, OptimisticLockingMixin, Base):
@@ -18,7 +18,9 @@ class Prediction(SoftDeleteMixin, OptimisticLockingMixin, Base):
     )
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    study_id = Column(UUID(as_uuid=True), ForeignKey("studies.id", ondelete="CASCADE"), nullable=False)
+    study_id = Column(
+        UUID(as_uuid=True), ForeignKey("studies.id", ondelete="CASCADE"), nullable=False
+    )
     model_version = Column(String(50), nullable=False)
     prediction_class = Column(String(100), nullable=True)
     confidence = Column(Float, nullable=True)

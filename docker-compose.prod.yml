@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-armt_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-armt_gan}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+
+  redis:
+    image: redis:7
+    restart: always
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
+    volumes:
+      - uploads:/app/uploads
+      - storage:/app/storage
+      - outputs:/app/outputs
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-armt_user}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-armt_gan}
+      - REDIS_URL=redis://redis:6379/0
+      - ENVIRONMENT=production
+      - API_KEY=${API_KEY}
+    depends_on:
+      - db
+      - redis
+    restart: always
+
+  celery_worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: celery -A workers.celery_app worker --loglevel=info --concurrency=2
+    volumes:
+      - uploads:/app/uploads
+      - storage:/app/storage
+      - outputs:/app/outputs
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-armt_user}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-armt_gan}
+      - REDIS_URL=redis://redis:6379/0
+      - ENVIRONMENT=production
+    depends_on:
+      - db
+      - redis
+    restart: always
+
+volumes:
+  postgres_data:
+  uploads:
+  storage:
+  outputs:

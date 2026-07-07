@@ -11,19 +11,22 @@ class BasePreprocessor(ABC):
     def process(self, image: MRIImage, **kwargs: Any) -> MRIImage:
         """
         Apply the preprocessing step to the given MRIImage.
-        
+
         Args:
             image: The input MRIImage.
             **kwargs: Additional parameters for the preprocessing step.
-            
+
         Returns:
             A new MRIImage instance with the processed data.
         """
         pass
 
+
 class SkullStripper(BasePreprocessor):
     """Interface for skull stripping algorithms."""
+
     pass
+
 
 class Registrator(BasePreprocessor):
     """Interface for image registration algorithms."""
@@ -40,29 +43,40 @@ class Registrator(BasePreprocessor):
         Default process method might not be directly applicable without a fixed image,
         but implementations can provide a default atlas if fixed_image is not provided in kwargs.
         """
-        fixed_image = kwargs.get('fixed_image')
+        fixed_image = kwargs.get("fixed_image")
         if not fixed_image:
-            raise ValueError("Registrator requires a 'fixed_image' in kwargs for default process method.")
+            raise ValueError(
+                "Registrator requires a 'fixed_image' in kwargs for default process method."
+            )
         return self.register(image, fixed_image, **kwargs)
+
 
 class BiasCorrector(BasePreprocessor):
     """Interface for bias field correction algorithms (e.g., N4)."""
+
     pass
+
 
 class Resampler(BasePreprocessor):
     """Interface for image resampling algorithms."""
 
     @abstractmethod
-    def resample_to_spacing(self, image: MRIImage, target_spacing: tuple[float, ...], **kwargs: Any) -> MRIImage:
+    def resample_to_spacing(
+        self, image: MRIImage, target_spacing: tuple[float, ...], **kwargs: Any
+    ) -> MRIImage:
         """
         Resample the image to a specific voxel spacing.
         """
         pass
 
+
 class IntensityNormalizer(BasePreprocessor):
     """Interface for intensity normalization algorithms (e.g., Z-score, Min-Max)."""
+
     pass
+
 
 class Denoiser(BasePreprocessor):
     """Interface for denoising algorithms."""
+
     pass

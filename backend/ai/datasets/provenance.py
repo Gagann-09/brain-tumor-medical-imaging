@@ -1,6 +1,5 @@
 import hashlib
 import json
-import os
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -15,12 +14,24 @@ class ProvenanceRecord(BaseModel):
     source: str = Field(..., description="Source URL or institution")
     version: str = Field(..., description="Dataset version (e.g., v1.0.0)")
     license: str = Field(..., description="License under which the dataset is distributed")
-    checksum: str = Field(..., description="SHA-256 checksum or fingerprint of the dataset source files")
-    fingerprint_mode: str = Field("fast", description="Mode used to generate checksum (fast or full)")
-    acquisition_metadata: dict[str, Any] = Field(default_factory=dict, description="Scanner/Sequence details if available")
-    preprocessing_history: list[str] = Field(default_factory=list, description="List of preprocessing steps applied")
-    annotation_version: str | None = Field(None, description="Version of the accompanying annotations")
-    timestamp: datetime = Field(default_factory=datetime.utcnow, description="When the record was created/updated")
+    checksum: str = Field(
+        ..., description="SHA-256 checksum or fingerprint of the dataset source files"
+    )
+    fingerprint_mode: str = Field(
+        "fast", description="Mode used to generate checksum (fast or full)"
+    )
+    acquisition_metadata: dict[str, Any] = Field(
+        default_factory=dict, description="Scanner/Sequence details if available"
+    )
+    preprocessing_history: list[str] = Field(
+        default_factory=list, description="List of preprocessing steps applied"
+    )
+    annotation_version: str | None = Field(
+        None, description="Version of the accompanying annotations"
+    )
+    timestamp: datetime = Field(
+        default_factory=datetime.utcnow, description="When the record was created/updated"
+    )
 
 
 class DatasetProvenanceManager:
@@ -41,27 +52,29 @@ class DatasetProvenanceManager:
     def generate_fingerprint(dataset_path: str, mode: str = "fast") -> str:
         """
         Generate a reproducible fingerprint for a dataset directory.
-        
+
         Args:
             dataset_path: Path to the dataset.
             mode: "fast" (size + mtime + relpath) or "full" (SHA-256 content hash).
         """
         root_path = Path(dataset_path)
         if not root_path.exists():
-            raise FileNotFoundError(f"Cannot generate fingerprint: path '{dataset_path}' does not exist.")
+            raise FileNotFoundError(
+                f"Cannot generate fingerprint: path '{dataset_path}' does not exist."
+            )
 
         # Collect all files, sort to ensure reproducible order
         all_files = sorted(
             [p for p in root_path.rglob("*") if p.is_file()],
-            key=lambda p: str(p.relative_to(root_path))
+            key=lambda p: str(p.relative_to(root_path)),
         )
-        
+
         hash_obj = hashlib.sha256()
 
         for filepath in all_files:
             rel_path = str(filepath.relative_to(root_path))
             stat = filepath.stat()
-            
+
             if mode == "fast":
                 # Fast mode: Hash relative path, size, and modification time
                 file_signature = f"{rel_path}|{stat.st_size}|{stat.st_mtime}"

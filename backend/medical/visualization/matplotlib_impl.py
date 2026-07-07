@@ -39,15 +39,15 @@ class MatplotlibVisualizationEngine(VisualizationEngine):
         modality: str,
         axis: int = 2,
         slice_idx: int = -1,
-        cmap: str = 'gray',
-        **kwargs: Any
+        cmap: str = "gray",
+        **kwargs: Any,
     ) -> "Figure":
         volume = image.get_volume(modality)
         slice_data = self._get_slice(volume, axis, slice_idx)
 
         fig, ax = plt.subplots(**kwargs)
-        ax.imshow(slice_data.T, cmap=cmap, origin='lower')
-        ax.axis('off')
+        ax.imshow(slice_data.T, cmap=cmap, origin="lower")
+        ax.axis("off")
         return fig
 
     def plot_overlay(
@@ -59,9 +59,9 @@ class MatplotlibVisualizationEngine(VisualizationEngine):
         axis: int = 2,
         slice_idx: int = -1,
         alpha: float = 0.5,
-        base_cmap: str = 'gray',
-        overlay_cmap: str = 'jet',
-        **kwargs: Any
+        base_cmap: str = "gray",
+        overlay_cmap: str = "jet",
+        **kwargs: Any,
     ) -> "Figure":
         base_volume = base_image.get_volume(base_modality)
         overlay_volume = overlay_image.get_volume(overlay_modality)
@@ -76,7 +76,7 @@ class MatplotlibVisualizationEngine(VisualizationEngine):
         overlay_masked = np.ma.masked_where(overlay_slice == 0, overlay_slice)
 
         fig, ax = plt.subplots(**kwargs)
-        ax.imshow(base_slice.T, cmap=base_cmap, origin='lower')
-        ax.imshow(overlay_masked.T, cmap=overlay_cmap, alpha=alpha, origin='lower')
-        ax.axis('off')
+        ax.imshow(base_slice.T, cmap=base_cmap, origin="lower")
+        ax.imshow(overlay_masked.T, cmap=overlay_cmap, alpha=alpha, origin="lower")
+        ax.axis("off")
         return fig

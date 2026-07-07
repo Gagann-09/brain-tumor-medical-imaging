@@ -11,6 +11,7 @@ class OptimizerProvider(ABC):
         """Instantiate and return the optimizer."""
         pass
 
+
 class SchedulerProvider(ABC):
     """Provides the learning rate scheduler for the training engine."""
 
@@ -18,6 +19,7 @@ class SchedulerProvider(ABC):
     def get_scheduler(self, optimizer: Any) -> Any:
         """Instantiate and return the scheduler."""
         pass
+
 
 class LossProvider(ABC):
     """Provides the loss function for the training engine."""

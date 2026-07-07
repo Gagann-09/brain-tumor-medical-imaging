@@ -9,7 +9,11 @@ class S3Storage(ObjectStorage):
     """Store files on AWS S3."""
 
     def __init__(
-        self, bucket: str, region: str, access_key: str = "", secret_key: str = "",
+        self,
+        bucket: str,
+        region: str,
+        access_key: str = "",
+        secret_key: str = "",
     ) -> None:
         import boto3
 

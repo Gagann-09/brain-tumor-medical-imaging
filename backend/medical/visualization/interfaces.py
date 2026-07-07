@@ -9,16 +9,11 @@ class VisualizationEngine(ABC):
 
     @abstractmethod
     def plot_slice(
-        self,
-        image: MRIImage,
-        modality: str,
-        axis: int = 2,
-        slice_idx: int = -1,
-        **kwargs: Any
+        self, image: MRIImage, modality: str, axis: int = 2, slice_idx: int = -1, **kwargs: Any
     ) -> Any:
         """
         Plot a single 2D slice from a 3D volume.
-        
+
         Args:
             image: MRIImage instance.
             modality: The modality to plot (e.g., 'T1').
@@ -37,7 +32,7 @@ class VisualizationEngine(ABC):
         axis: int = 2,
         slice_idx: int = -1,
         alpha: float = 0.5,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> Any:
         """
         Plot a slice with an overlay (e.g., segmentation mask or heatmap).

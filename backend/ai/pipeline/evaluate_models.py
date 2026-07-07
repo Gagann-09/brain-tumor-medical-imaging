@@ -37,10 +37,13 @@ def calculate_metrics(preds: torch.Tensor, targets: torch.Tensor) -> dict[str, f
         "recall": recall,
         "specificity": specificity,
         "f1": f1,
-        "hausdorff_95": hausdorff_95
+        "hausdorff_95": hausdorff_95,
     }
 
-def benchmark_model(model: torch.nn.Module, data_loader: Any, device: torch.device) -> dict[str, Any]:
+
+def benchmark_model(
+    model: torch.nn.Module, data_loader: Any, device: torch.device
+) -> dict[str, Any]:
     model.to(device)
     model.eval()
 
@@ -74,7 +77,11 @@ def benchmark_model(model: torch.nn.Module, data_loader: Any, device: torch.devi
                 all_metrics.append(calculate_metrics(preds, targets))
 
     # Aggregate
-    aggregated = {k: np.mean([m[k] for m in all_metrics]) for k in all_metrics[0].keys()} if all_metrics else {}
+    aggregated = (
+        {k: np.mean([m[k] for m in all_metrics]) for k in all_metrics[0]}
+        if all_metrics
+        else {}
+    )
 
     # System metrics
     avg_latency = np.mean(latencies) if latencies else 0.0
@@ -82,47 +89,50 @@ def benchmark_model(model: torch.nn.Module, data_loader: Any, device: torch.devi
 
     param_count = sum(p.numel() for p in model.parameters())
 
-    mem_alloc = torch.cuda.max_memory_allocated(device) / (1024 ** 2) if device.type == "cuda" else 0.0
+    mem_alloc = (
+        torch.cuda.max_memory_allocated(device) / (1024**2) if device.type == "cuda" else 0.0
+    )
 
-    aggregated.update({
-        "latency_sec": avg_latency,
-        "fps": fps,
-        "param_count": param_count,
-        "gpu_mem_mb": mem_alloc,
-        "has_nan": float(has_nan)
-    })
+    aggregated.update(
+        {
+            "latency_sec": avg_latency,
+            "fps": fps,
+            "param_count": param_count,
+            "gpu_mem_mb": mem_alloc,
+            "has_nan": float(has_nan),
+        }
+    )
 
     return aggregated
 
+
 def run_comparison(unet_model, armt_model, test_loader, registry_dir, repro_meta=None):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    
-    print("Benchmarking UNet...")
+
     unet_results = benchmark_model(unet_model, test_loader, device)
-    
-    print("Benchmarking ARMT-GAN...")
+
     armt_results = benchmark_model(armt_model, test_loader, device)
-    
+
     registry = BenchmarkRegistry(registry_dir)
-    
-    outcome = "ARMT-GAN Outperforms UNet" if armt_results.get("dice", 0) > unet_results.get("dice", 0) else "UNet Retains Baseline"
+
+    outcome = (
+        "ARMT-GAN Outperforms UNet"
+        if armt_results.get("dice", 0) > unet_results.get("dice", 0)
+        else "UNet Retains Baseline"
+    )
     if armt_results.get("has_nan"):
         outcome = "ARMT-GAN Failed (NaN detected)"
-        
+
     record = BenchmarkRecord(
         benchmark_id=f"bench_{int(time.time())}",
         models_compared=["UNetBaseline", "ARMTGANModel"],
         dataset="BraTS_Test",
-        metrics={
-            "UNetBaseline": unet_results,
-            "ARMTGANModel": armt_results
-        },
+        metrics={"UNetBaseline": unet_results, "ARMTGANModel": armt_results},
         hardware=device.type,
         configuration={},
         reproducibility=repro_meta or {},
-        outcome=outcome
+        outcome=outcome,
     )
-    
+
     registry.add_benchmark(record)
-    print(f"Benchmark finished. Outcome: {outcome}")
     return record, unet_results, armt_results

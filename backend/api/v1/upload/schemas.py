@@ -8,6 +8,7 @@ from pydantic import BaseModel
 
 class UploadCreate(BaseModel):
     """Request to create a upload."""
+
     patient_id: UUID
     study_type: str
     description: str | None = None
@@ -15,6 +16,7 @@ class UploadCreate(BaseModel):
 
 class UploadResponse(BaseModel):
     """Response for upload data."""
+
     id: UUID
     patient_id: UUID
     study_type: str

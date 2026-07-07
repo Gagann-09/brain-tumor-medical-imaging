@@ -1,4 +1,5 @@
 """Dataset registry implementation."""
+
 from typing import Any
 
 from pydantic import BaseModel
@@ -6,6 +7,7 @@ from pydantic import BaseModel
 
 class DatasetRegistration(BaseModel):
     """Metadata for a registered dataset."""
+
     name: str
     adapter_class: Any
     supported_tasks: list[str]
@@ -14,10 +16,11 @@ class DatasetRegistration(BaseModel):
     transform_configuration: dict[str, Any]
     metadata: dict[str, Any]
 
+
 class DatasetRegistry:
     """Central registry for all AI datasets."""
 
-    _registry: dict[str, DatasetRegistration] = {}
+    _registry: dict[str, DatasetRegistration] = {}  # type: ignore  # type: ignore
 
     @classmethod
     def register(cls, name: str, registration: DatasetRegistration) -> None:

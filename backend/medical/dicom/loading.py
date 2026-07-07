@@ -17,7 +17,8 @@ def load_dicom_file(filepath: str | Path) -> pydicom.dataset.FileDataset:
         dataset = pydicom.dcmread(str(path))
         return dataset
     except Exception as e:
-        raise CorruptedDataError(f"Failed to read DICOM file {path}: {e!s}")
+        raise CorruptedDataError(f"Failed to read DICOM file {path}: {e!s}") from e
+
 
 def load_dicom_series(directory: str | Path) -> list[pydicom.dataset.FileDataset]:
     """
@@ -37,7 +38,7 @@ def load_dicom_series(directory: str | Path) -> list[pydicom.dataset.FileDataset
                 datasets.append(ds)
             except pydicom.errors.InvalidDicomError:
                 continue
-            except Exception:
+            except Exception:  # noqa: S112
                 continue
 
     if not datasets:

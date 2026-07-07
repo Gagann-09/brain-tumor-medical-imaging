@@ -35,7 +35,11 @@ class ImageMetadata(BaseModel):
     series_description: str | None = Field(None, description="Description of the series")
     manufacturer: str | None = Field(None, description="Manufacturer of the equipment")
     manufacturer_model_name: str | None = Field(None, description="Model name of the equipment")
-    magnetic_field_strength: float | None = Field(None, description="Magnetic field strength (for MR)")
+    magnetic_field_strength: float | None = Field(
+        None, description="Magnetic field strength (for MR)"
+    )
     spacing_between_slices: float | None = Field(None, description="Spacing between slices in mm")
     slice_thickness: float | None = Field(None, description="Slice thickness in mm")
-    pixel_spacing: list[float] | None = Field(None, description="Physical distance between pixel centers [row, col] in mm")
+    pixel_spacing: list[float] | None = Field(
+        None, description="Physical distance between pixel centers [row, col] in mm"
+    )

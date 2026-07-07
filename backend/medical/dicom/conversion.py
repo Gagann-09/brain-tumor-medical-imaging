@@ -1,9 +1,10 @@
-
 import numpy as np
 import pydicom
 
 
-def extract_volume_and_affine(datasets: list[pydicom.dataset.FileDataset]) -> tuple[np.ndarray, np.ndarray]:
+def extract_volume_and_affine(
+    datasets: list[pydicom.dataset.FileDataset],
+) -> tuple[np.ndarray, np.ndarray]:
     """
     Convert a list of DICOM datasets (representing a series) into a 3D numpy array
     and compute its affine transformation matrix.

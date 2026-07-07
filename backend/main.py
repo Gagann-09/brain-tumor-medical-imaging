@@ -7,6 +7,7 @@ import structlog
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from prometheus_client import make_asgi_app
 
 from api.errors import APIError, api_error_handler, internal_error_handler, validation_error_handler
 from api.health.router import router as health_router
@@ -14,17 +15,16 @@ from api.v1.router import api_v1_router
 from core.config import get_settings
 from core.constants import API_V1_PREFIX
 from core.logging.config import setup_logging
-from core.middleware.correlation import CorrelationIdMiddleware
-from core.middleware.logging import RequestLoggingMiddleware
-from core.middleware.security_headers import SecurityHeadersMiddleware
-from core.middleware.database import DatabaseSessionMiddleware
-from core.middleware.rate_limit import RateLimitMiddleware
-from core.middleware.idempotency import IdempotencyMiddleware
-from core.middleware.upload_size import UploadSizeLimitMiddleware
-from core.middleware.observability import ObservabilityMiddleware
-from core.middleware.timeout import TimeoutMiddleware
 from core.middleware.api_version import APIVersionMiddleware
-from prometheus_client import make_asgi_app
+from core.middleware.correlation import CorrelationIdMiddleware
+from core.middleware.database import DatabaseSessionMiddleware
+from core.middleware.idempotency import IdempotencyMiddleware
+from core.middleware.logging import RequestLoggingMiddleware
+from core.middleware.observability import ObservabilityMiddleware
+from core.middleware.rate_limit import RateLimitMiddleware
+from core.middleware.security_headers import SecurityHeadersMiddleware
+from core.middleware.timeout import TimeoutMiddleware
+from core.middleware.upload_size import UploadSizeLimitMiddleware
 
 settings = get_settings()
 

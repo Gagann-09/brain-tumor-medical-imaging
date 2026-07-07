@@ -1,7 +1,10 @@
-from sqlalchemy import Column, String, Integer, JSON, DateTime, Index
+from sqlalchemy import JSON, Column, DateTime, Index, Integer, String
 from sqlalchemy.sql import func
-from .base import Base
+
 from schemas.inference import JobState
+
+from .base import Base
+
 
 class InferenceJobModel(Base):
     __tablename__ = "inference_jobs"
@@ -22,6 +25,4 @@ class InferenceJobModel(Base):
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
     # Ensure idempotency scoped by user
-    __table_args__ = (
-        Index('ix_user_idempotency', 'user_id', 'idempotency_key', unique=True),
-    )
+    __table_args__ = (Index("ix_user_idempotency", "user_id", "idempotency_key", unique=True),)

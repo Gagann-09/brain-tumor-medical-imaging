@@ -20,6 +20,7 @@ class QualityMetric(ABC):
         """
         pass
 
+
 class QualityAssessmentEngine:
     """
     Engine to run multiple quality metrics on an image and return a report.
@@ -42,6 +43,7 @@ class QualityAssessmentEngine:
             results[name] = metric.calculate(image, modality, **kwargs)
         return results
 
+
 # Basic Interfaces for future implementation
 class SignalToNoiseRatio(QualityMetric):
     @property
@@ -51,6 +53,7 @@ class SignalToNoiseRatio(QualityMetric):
     def calculate(self, image: MRIImage, modality: str, **kwargs: Any) -> float:
         # Placeholder for actual SNR calculation
         return 0.0
+
 
 class ContrastToNoiseRatio(QualityMetric):
     @property

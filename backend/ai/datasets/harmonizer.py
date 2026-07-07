@@ -19,17 +19,22 @@ class DatasetHarmonizer:
             "t2w": "T2",
             "t2-weighted": "T2",
             "flair": "FLAIR",
-            "t2-flair": "FLAIR"
+            "t2-flair": "FLAIR",
         }
 
     def harmonize_modality_name(self, raw_name: str) -> str:
         """Standardize a modality string."""
         return self.modality_mapping.get(raw_name.lower(), raw_name)
 
-    def harmonize_label_schema(self, annotation: SegmentationAnnotation, target_map: dict[int, str], value_mapping: dict[int, int]) -> SegmentationAnnotation:
+    def harmonize_label_schema(
+        self,
+        annotation: SegmentationAnnotation,
+        target_map: dict[int, str],
+        value_mapping: dict[int, int],
+    ) -> SegmentationAnnotation:
         """
         Harmonize a segmentation mask's values to a target schema.
-        
+
         Args:
             annotation: The input SegmentationAnnotation.
             target_map: The new label map (e.g., {1: 'Core', 2: 'Edema'}).
@@ -40,9 +45,7 @@ class DatasetHarmonizer:
             new_mask[annotation.mask == old_val] = new_val
 
         return SegmentationAnnotation(
-            mask=new_mask,
-            label_map=target_map,
-            metadata=annotation.metadata
+            mask=new_mask, label_map=target_map, metadata=annotation.metadata
         )
 
     def harmonize_study(self, study: MRIStudy) -> MRIStudy:

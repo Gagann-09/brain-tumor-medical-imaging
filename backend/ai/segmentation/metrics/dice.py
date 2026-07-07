@@ -8,7 +8,9 @@ class DiceMetricWrapper:
     """Wrapper for the MONAI DiceMetric."""
 
     def __init__(self, include_background: bool = False, reduction: str = "mean", **kwargs: Any):
-        self.metric = DiceMetric(include_background=include_background, reduction=reduction, **kwargs)
+        self.metric = DiceMetric(
+            include_background=include_background, reduction=reduction, **kwargs
+        )
 
     def __call__(self, preds: torch.Tensor, targets: torch.Tensor) -> float:
         """Computes the Dice metric for a batch and returns the aggregated mean."""

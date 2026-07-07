@@ -8,12 +8,14 @@ from pydantic import BaseModel
 
 class SegmentationCreate(BaseModel):
     """Request to create a segmentation."""
+
     study_id: UUID
     model_version: str = "v1.0.0"
 
 
 class SegmentationResponse(BaseModel):
     """Response for segmentation data."""
+
     id: UUID
     study_id: UUID
     model_version: str

@@ -1,4 +1,5 @@
 """Model registry implementation."""
+
 from datetime import datetime
 from typing import Any
 
@@ -7,6 +8,7 @@ from pydantic import BaseModel, Field
 
 class ModelRegistration(BaseModel):
     """Metadata for a registered model."""
+
     name: str
     version: str
     task: str
@@ -19,10 +21,11 @@ class ModelRegistration(BaseModel):
     production_status: str = Field(default="development")
     artifact_location: str
 
+
 class ModelRegistry:
     """Central registry for all AI models and their metadata."""
 
-    _registry: dict[str, list[ModelRegistration]] = {}
+    _registry: dict[str, list[ModelRegistration]] = {}  # type: ignore  # type: ignore
 
     @classmethod
     def register(cls, model: ModelRegistration) -> None:

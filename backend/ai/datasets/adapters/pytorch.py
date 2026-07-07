@@ -17,10 +17,16 @@ from medical.domain import MRIStudy
 class PyTorchDatasetAdapter(Dataset):
     """
     Adapter bridging BaseDataset (containing MRIStudy objects) to PyTorch.
-    It combines multi-modality volumes into a single 4D tensor (C, H, W, D) 
+    It combines multi-modality volumes into a single 4D tensor (C, H, W, D)
     and applies MONAI/torchvision transforms.
     """
-    def __init__(self, base_dataset: BaseDataset, required_modalities: list[str] | None = None, transforms: Callable | None = None):
+
+    def __init__(
+        self,
+        base_dataset: BaseDataset,
+        required_modalities: list[str] | None = None,
+        transforms: Callable | None = None,
+    ):
         if torch is None:
             raise ImportError("PyTorch is not installed.")
 

@@ -8,11 +8,13 @@ from pydantic import BaseModel
 
 class XaiCreate(BaseModel):
     """Request to create a xai."""
+
     prediction_id: UUID
 
 
 class XaiResponse(BaseModel):
     """Response for xai data."""
+
     id: UUID
     prediction_id: UUID
     explanation_type: str

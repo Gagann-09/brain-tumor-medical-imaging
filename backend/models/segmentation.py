@@ -2,12 +2,12 @@
 
 import uuid
 
-from sqlalchemy import Column, DateTime, Float, ForeignKey, String, Index
+from sqlalchemy import Column, DateTime, Float, ForeignKey, Index, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 
 from .base import Base
-from .mixins import SoftDeleteMixin, OptimisticLockingMixin
+from .mixins import OptimisticLockingMixin, SoftDeleteMixin
 
 
 class SegmentationResult(SoftDeleteMixin, OptimisticLockingMixin, Base):
@@ -18,8 +18,12 @@ class SegmentationResult(SoftDeleteMixin, OptimisticLockingMixin, Base):
     )
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    study_id = Column(UUID(as_uuid=True), ForeignKey("studies.id", ondelete="CASCADE"), nullable=False)
-    prediction_id = Column(UUID(as_uuid=True), ForeignKey("predictions.id", ondelete="SET NULL"), nullable=True)
+    study_id = Column(
+        UUID(as_uuid=True), ForeignKey("studies.id", ondelete="CASCADE"), nullable=False
+    )
+    prediction_id = Column(
+        UUID(as_uuid=True), ForeignKey("predictions.id", ondelete="SET NULL"), nullable=True
+    )
     model_version = Column(String(50), nullable=False)
     mask_path = Column(String(500), nullable=True)
     tumor_volume_mm3 = Column(Float, nullable=True)

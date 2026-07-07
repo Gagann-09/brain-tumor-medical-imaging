@@ -13,5 +13,5 @@ __all__ = [
     "parse_patient_metadata",
     "parse_study_metadata",
     "validate_dicom_file",
-    "validate_dicom_series"
+    "validate_dicom_series",
 ]

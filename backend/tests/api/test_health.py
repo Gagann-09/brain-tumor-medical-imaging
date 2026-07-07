@@ -1,4 +1,5 @@
 """API tests for health endpoints."""
+from unittest.mock import AsyncMock, patch
 
 
 def test_health(client):
@@ -16,7 +17,11 @@ def test_liveness(client):
     assert response.json()["status"] == "alive"
 
 
-def test_readiness(client):
+@patch("api.health.router.HAS_REDIS", True)
+@patch("api.health.router.redis")
+def test_readiness(mock_redis, client):
+    mock_r = AsyncMock()
+    mock_redis.from_url.return_value = mock_r
     """GET /health/ready returns 200 when DB is reachable."""
     response = client.get("/health/ready")
     assert response.status_code == 200

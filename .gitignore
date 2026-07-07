@@ -1,8 +1,20 @@
-# ==============================================================================
-# ARM-GAN Platform .gitignore
-# ==============================================================================
+# Operating System
+.DS_Store
+Thumbs.db
+Desktop.ini
+.Spotlight-V100/
+.Trashes/
 
-# ── 1. Python & Caches ───────────────────────────────────────────────────────
+# Editors / IDEs
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+.openclaude-profile.json
+
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
@@ -19,29 +31,11 @@ develop-eggs/
 .Python
 pip-log.txt
 pip-delete-this-directory.txt
-.pytest_cache/
-.coverage
-htmlcov/
-.tox/
-.nox/
-.hypothesis/
-.mypy_cache/
-.ruff_cache/
-.ipynb_checkpoints/
-.python-version
-venv/
 .venv/
-*.prof
-*.profraw
-*.profdata
-*.fingerprint
-*.cache
-.cache/
-.dataset_cache/
-.preprocessing_cache/
-.dataloader_cache/
+venv/
+.python-version
 
-# ── 2. Node.js & Frontend ────────────────────────────────────────────────────
+# Node
 node_modules/
 .next/
 out/
@@ -54,24 +48,106 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# ── 3. IDE, Editor & OS ──────────────────────────────────────────────────────
-.vscode/*
-!.vscode/extensions.json
-.idea/
-*.swp
-*.swo
-*~
-.DS_Store
-Thumbs.db
-Desktop.ini
-.Spotlight-V100/
-.Trashes/
-.openclaude-profile.json
+# Virtual Environments
+# (Handled in Python section: .venv/, venv/)
 
-# ── 4. Secrets & Certificates ────────────────────────────────────────────────
+# Build Artifacts
+# (Handled in Python/Node sections: build/, dist/, out/)
+
+# Runtime Outputs
+/outputs/
+/backend/outputs_val/
+/outputs_val/
+/results/
+/test_inference_output/
+/test_robustness_output/
+/test_xai_output/
+/generated/
+/openapi/
+/profiler/
+/profiling/
+/traces/
+
+# ML Artifacts
+*.pth
+*.pt
+*.onnx
+*.ckpt
+*.engine
+*.h5
+*.hdf5
+*.keras
+*.pb
+*.safetensors
+*.bin
+*.pkl
+*.joblib
+*.tflite
+*.mlmodel
+*.weights
+
+# Experiment Outputs
+experiments/**/outputs/
+experiments/**/plots/
+experiments/**/reports/
+experiments/**/benchmarks/
+/experiments/
+/experiment_outputs/
+/mlruns/
+/mlartifacts/
+
+# Logs
+*.log
+/logs/
+
+# Coverage
+.coverage
+htmlcov/
+
+# Testing
+.pytest_cache/
+.tox/
+.nox/
+.hypothesis/
+.mypy_cache/
+.ruff_cache/
+
+# Docker
+.docker/
+docker-compose.override.yml
+
+# Temporary Files
+/temp/
+/tmp/
+*.tmp
+*.bak
+.ipynb_checkpoints/
+optuna_tmp/
+
+# Local Configuration
+*.local.yml
+*.local.yaml
+*.local.json
+kubeconfig
+*.kubeconfig
+create_structure.py
+*.sqlite
+*.sqlite3
+*.db
+*.db3
+dump.rdb
+appendonly.aof
+*.prof
+*.profraw
+*.profdata
+*.fingerprint
+
+# Secrets
 .env
+.env.local
 .env.*
 !.env.example
+!.env.production.example
 *.pem
 *.key
 *.crt
@@ -79,16 +155,19 @@ Desktop.ini
 *.p12
 *.pfx
 
-# ── 5. Medical Data & Datasets ───────────────────────────────────────────────
-datasets/*
+# Dataset Storage
+datasets/**
 !datasets/README.md
+!datasets/**/.gitkeep
 /uploads/
 /storage/
-/temp/
-/tmp/
 /cache/
 /quarantine/
 /inference_cache/
+.cache/
+.dataset_cache/
+.preprocessing_cache/
+.dataloader_cache/
 *.dcm
 *.nii
 *.nii.gz
@@ -98,69 +177,39 @@ datasets/*
 *.zraw
 *.nrrd
 
-# ── 6. ML Models & Artifacts ─────────────────────────────────────────────────
-models/*
+# Model Storage
+models/**
 !models/README.md
+!models/**/.gitkeep
 /checkpoints/
 /best_models/
 /exports/
-*.pt
-*.pth
-*.h5
-*.hdf5
-*.keras
-*.onnx
-*.pb
-*.ckpt
-*.safetensors
-*.bin
-*.pkl
-*.joblib
-*.tflite
-*.mlmodel
-*.engine
-*.weights
 
-# ── 7. Training Runtime, Tracking & Logs ─────────────────────────────────────
-/outputs/
-/backend/outputs_val/
-/outputs_val/
-/results/
-/test_inference_output/
-/test_robustness_output/
-/test_xai_output/
-/experiments/
-/experiment_outputs/
+# Benchmark Outputs
 /benchmark_outputs/
-/comparison_outputs/
-/reports/generated/
-/generated/
-/openapi/
-/profiler/
-/profiling/
-/traces/
-/logs/
-/tensorboard/
-/tb_logs/
-/mlruns/
-/mlartifacts/
-/ray_results/
-/wandb/
-/.wandb/
-/visualizations/
-*.log
-*.tmp
-*.bak
-mlflow.db
-*.tfevents.*
-
-# ── 8. Generated Experiment Files & Reports ──────────────────────────────────
-provenance.json
-metrics.json
-metrics.jsonl
 benchmark.json
 benchmark.csv
 benchmark.md
+*_benchmark_summary.csv
+*_benchmark_summary.json
+
+# Visualizations
+/visualizations/
+generated_*.png
+overlay_*.png
+*overlay*.png
+*visualization*.png
+*.png
+# Overrides for docs images
+!docs/assets/**/*.png
+
+# Generated Reports
+/reports/
+/reports/generated/
+/comparison_outputs/
+provenance.json
+metrics.json
+metrics.jsonl
 model_card.json
 model_card.md
 model_card_*.md
@@ -175,40 +224,31 @@ comparison_report.md
 *_validation_report.json
 *_validation_report.md
 *_validation_report.html
-*_benchmark_summary.csv
-*_benchmark_summary.json
-*overlay*.png
-*visualization*.png
 *_report.html
 
-# ── 9. Docker & Infrastructure ───────────────────────────────────────────────
-.docker/
-docker-compose.override.yml
-*.sock
-.terraform/
-*.tfstate
-*.tfstate.*
-crash.log
-crash.*.log
-*.tfvars
-*.tfvars.json
-override.tf
-override.tf.json
-*_override.tf
-*_override.tf.json
-.terraformrc
-terraform.rc
+# Weights & Biases
+wandb/
+/.wandb/
 
-# ── 10. Databases & Local Config ─────────────────────────────────────────────
-*.sqlite
-*.sqlite3
-*.db
-*.db3
-dump.rdb
-appendonly.aof
-*.local.yml
-*.local.yaml
-*.local.json
-kubeconfig
-*.kubeconfig
-create_structure.py
+# TensorBoard
+runs/
+events.out.tfevents*
+/tensorboard/
+/tb_logs/
+
+# Ray
+/ray_results/
+
+# MLflow Database
+mlflow.db
+
+# Added automatically
+celerybeat-schedule.*
+ruff_*.json
+ruff_*.txt
+remaining_violations.txt
+openapi_schema.json
+/diagnostics/
+backend/mlruns/
+backend/experiments/
+

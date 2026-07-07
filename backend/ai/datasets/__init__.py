@@ -17,5 +17,5 @@ __all__ = [
     "PatientSplitStrategy",
     "ProvenanceRecord",
     "SplitStrategy",
-    "ValidationConfig"
+    "ValidationConfig",
 ]

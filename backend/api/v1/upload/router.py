@@ -1,8 +1,9 @@
 """Medical image upload and processing endpoints."""
 
-from fastapi import APIRouter, Depends, UploadFile, File, Form
-from sqlalchemy.orm import Session
 import uuid
+
+from fastapi import APIRouter, Depends, File, Form, UploadFile
+from sqlalchemy.orm import Session
 
 from api.dependencies import get_current_user
 from schemas.common import APIResponse

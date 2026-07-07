@@ -18,13 +18,16 @@ class SegmentationRepository:
 
     def list_by_study(self, study_id: UUID) -> list[SegmentationResult]:
         return (
-            self.db.query(SegmentationResult)
-            .filter(SegmentationResult.study_id == study_id)
-            .all()
+            self.db.query(SegmentationResult).filter(SegmentationResult.study_id == study_id).all()
         )
 
     def create(
-        self, *, study_id: UUID, model_version: str, requested_by: UUID, **kwargs,
+        self,
+        *,
+        study_id: UUID,
+        model_version: str,
+        requested_by: UUID,
+        **kwargs,
     ) -> SegmentationResult:
         seg = SegmentationResult(
             study_id=study_id,

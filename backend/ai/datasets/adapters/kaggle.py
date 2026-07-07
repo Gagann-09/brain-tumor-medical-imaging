@@ -12,7 +12,7 @@ from .base import BaseDatasetAdapter
 class KaggleDatasetAdapter(BaseDatasetAdapter):
     """
     Adapter for Kaggle supplementary classification datasets.
-    Assumes a CSV file maps study_id to a class label, and folders contain 
+    Assumes a CSV file maps study_id to a class label, and folders contain
     either 2D slices (e.g. .npy or .png mapped to numpy arrays) or 3D NIfTIs.
     """
 
@@ -30,7 +30,9 @@ class KaggleDatasetAdapter(BaseDatasetAdapter):
             reader = csv.DictReader(f)
             # Assuming columns 'study_id' and 'label'
             for row in reader:
-                study_id = row.get("study_id", row.get("BraTS21ID"))  # Example fallback for RSNA Kaggle
+                study_id = row.get(
+                    "study_id", row.get("BraTS21ID")
+                )  # Example fallback for RSNA Kaggle
                 label = row.get("label", row.get("MGMT_value"))
                 if study_id and label is not None:
                     # Pad to standard BraTS format if it's the RSNA dataset (e.g., "00001")
@@ -66,8 +68,5 @@ class KaggleDatasetAdapter(BaseDatasetAdapter):
             annotations.append(ClassificationAnnotation(class_name=class_name))
 
         return MRIStudy(
-            primary_image=image,
-            study_id=study_id,
-            patient_id=study_id,
-            annotations=annotations
+            primary_image=image, study_id=study_id, patient_id=study_id, annotations=annotations
         )

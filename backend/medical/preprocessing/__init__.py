@@ -15,5 +15,5 @@ __all__ = [
     "IntensityNormalizer",
     "Registrator",
     "Resampler",
-    "SkullStripper"
+    "SkullStripper",
 ]

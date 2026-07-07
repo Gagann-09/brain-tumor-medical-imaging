@@ -14,17 +14,20 @@ class TrainingOutput:
     auxiliary_losses: dict[str, torch.Tensor] | None = None
     predictions: torch.Tensor | None = None
 
+
 @dataclass
 class ValidationOutput:
     loss: float
     metrics: dict[str, float]
     predictions: torch.Tensor | None = None
 
+
 @dataclass
 class PredictionResult:
     predictions: torch.Tensor
     uncertainty: torch.Tensor | None = None
     metadata: dict[str, Any] | None = None
+
 
 class BaseModel(nn.Module, abc.ABC):
     """
@@ -48,7 +51,7 @@ class BaseModel(nn.Module, abc.ABC):
     def training_step(self, batch: Any, batch_idx: int) -> TrainingOutput:
         """
         Executes a single forward pass and loss computation for a batch.
-        Must return a strongly typed TrainingOutput. 
+        Must return a strongly typed TrainingOutput.
         Does NOT perform optimization (loss.backward() or optimizer.step()).
         """
         pass
@@ -83,13 +86,18 @@ class BaseModel(nn.Module, abc.ABC):
         """Loads weights from a checkpoint."""
         pass
 
+
 class BaseSegmentationModel(BaseModel, abc.ABC):
     """Base class for all segmentation models."""
+
     pass
+
 
 class BaseClassificationModel(BaseModel, abc.ABC):
     """Base class for all classification models."""
+
     pass
+
 
 class BaseGAN(BaseModel, abc.ABC):
     """Base class for all GAN models, defining explicit steps for generator and discriminator."""

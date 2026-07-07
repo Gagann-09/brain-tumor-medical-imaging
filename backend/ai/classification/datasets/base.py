@@ -1,13 +1,17 @@
-from typing import List, Dict, Any, Protocol
+from typing import Any
+
 from torch.utils.data import Dataset
+
 from .sample import ClassificationSample
+
 
 class BaseClassificationDataset(Dataset):
     """
     Base Dataset for Classification tasks.
     Operates on ClassificationSample objects rather than raw tensors.
     """
-    def __init__(self, samples: List[ClassificationSample]):
+
+    def __init__(self, samples: list[ClassificationSample]):
         self.samples = samples
 
     def __len__(self) -> int:
@@ -17,8 +21,6 @@ class BaseClassificationDataset(Dataset):
         # Note: the input pipeline/transforms will operate on these samples
         return self.samples[idx]
 
-    def get_metadata(self) -> Dict[str, Any]:
+    def get_metadata(self) -> dict[str, Any]:
         """Return dataset metadata."""
-        return {
-            "num_samples": len(self.samples)
-        }
+        return {"num_samples": len(self.samples)}

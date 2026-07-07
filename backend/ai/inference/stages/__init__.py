@@ -1,13 +1,12 @@
-from .base import BaseStage
-from .validation import InputValidationStage
-from .loading import MedicalImageLoadingStage
-from .preprocessing import PreprocessingStage
-from .segmentation import SegmentationStage
-from .roi_extraction import ROIExtractionStage
 from .classification import ClassificationStage
 from .explainability import ExplainabilityStage
+from .loading import MedicalImageLoadingStage
+from .preprocessing import PreprocessingStage
 from .report import ClinicalReportGenerationStage
 from .response import ResponseConstructionStage
+from .roi_extraction import ROIExtractionStage
+from .segmentation import SegmentationStage
+from .validation import InputValidationStage
 
 STAGE_CLASSES = {
     "InputValidationStage": InputValidationStage,
@@ -18,5 +17,5 @@ STAGE_CLASSES = {
     "ClassificationStage": ClassificationStage,
     "ExplainabilityStage": ExplainabilityStage,
     "ClinicalReportGenerationStage": ClinicalReportGenerationStage,
-    "ResponseConstructionStage": ResponseConstructionStage
+    "ResponseConstructionStage": ResponseConstructionStage,
 }

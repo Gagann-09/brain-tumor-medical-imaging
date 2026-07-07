@@ -1,7 +1,7 @@
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -10,12 +10,13 @@ class BenchmarkRecord(BaseModel):
     benchmark_id: str
     models_compared: list[str]
     dataset: str
-    metrics: Dict[str, Dict[str, float]]
+    metrics: dict[str, dict[str, float]]
     hardware: str
-    configuration: Dict[str, Any]
-    reproducibility: Dict[str, Any] = Field(default_factory=dict)
+    configuration: dict[str, Any]
+    reproducibility: dict[str, Any] = Field(default_factory=dict)
     timestamp: datetime = Field(default_factory=datetime.utcnow)
     outcome: str
+
 
 class BenchmarkRegistry:
     """Registry to store and query model comparison benchmarks."""

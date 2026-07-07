@@ -30,11 +30,14 @@ class EventType(Enum):
     INFERENCE_FINISHED = "inference_finished"
     INFERENCE_FAILED = "inference_failed"
 
+
 class Event:
     """A generic event containing context data."""
+
     def __init__(self, event_type: EventType, data: dict[str, Any] | None = None):
         self.type = event_type
         self.data = data or {}
+
 
 class EventBus:
     """Internal EventBus that publishes lifecycle events to registered subscribers."""

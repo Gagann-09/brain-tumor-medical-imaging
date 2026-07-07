@@ -1,15 +1,17 @@
-import torch
-from abc import ABC, abstractmethod
-from typing import Dict, Any
+from abc import abstractmethod
+from typing import Any
 
-from ai.models.base import BaseModel, PredictionResult, TrainingOutput, ValidationOutput
+import torch
+
+from ai.models.base import BaseModel
+
 
 class BaseClassificationModel(BaseModel):
     """
     Base contract for all Classification models.
     Supports multi-class or binary outputs and includes an extension point for calibration.
     """
-    
+
     @abstractmethod
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -18,7 +20,7 @@ class BaseClassificationModel(BaseModel):
             torch.Tensor: Logits of shape (B, num_classes) or (B, 1)
         """
         pass
-        
+
     def predict_proba(self, x: torch.Tensor) -> torch.Tensor:
         """
         Computes probabilities from the input tensor.
@@ -29,7 +31,7 @@ class BaseClassificationModel(BaseModel):
         if logits.shape[-1] == 1:
             return torch.sigmoid(logits)
         return torch.softmax(logits, dim=-1)
-        
+
     @abstractmethod
     def get_calibration_module(self) -> Any:
         """

@@ -15,6 +15,7 @@ class BaseDataset(ABC):
     def __getitem__(self, idx: int) -> Any:
         pass
 
+
 class TrainingDataset(BaseDataset):
     """Dataset optimized for training with augmentations."""
 
@@ -30,6 +31,7 @@ class TrainingDataset(BaseDataset):
         # Base implementation, adapters will handle PyTorch conversion
         return {"study": study, "transforms": self.transforms}
 
+
 class ValidationDataset(BaseDataset):
     """Dataset optimized for validation (no random augmentations)."""
 
@@ -44,6 +46,7 @@ class ValidationDataset(BaseDataset):
         study = self.studies[idx]
         return {"study": study, "transforms": self.transforms}
 
+
 class InferenceDataset(BaseDataset):
     """Dataset optimized for inference/prediction."""
 
@@ -57,6 +60,7 @@ class InferenceDataset(BaseDataset):
     def __getitem__(self, idx: int) -> Any:
         study = self.studies[idx]
         return {"study": study, "transforms": self.transforms}
+
 
 class DatasetBuilder(ABC):
     """Builds appropriate dataset objects for different phases."""
@@ -73,6 +77,7 @@ class DatasetBuilder(ABC):
     def build_inference_dataset(self) -> InferenceDataset:
         pass
 
+
 # PyTorch Adapter Interfaces (to be fully realized when connecting models)
 try:
     import torch
@@ -81,6 +86,7 @@ try:
 
     class PyTorchDatasetAdapter(TorchDataset):
         """Bridges BaseDataset to PyTorch Dataset."""
+
         def __init__(self, base_dataset: BaseDataset):
             self.base_dataset = base_dataset
 
@@ -89,25 +95,31 @@ try:
 
         def __getitem__(self, idx: int) -> Any:
             import torch
+
             # Mock implementation for baseline training
             return {
                 "inputs": torch.randn(4, 128, 128),
-                "targets": torch.randint(0, 2, (3, 128, 128)).float()
+                "targets": torch.randint(0, 2, (3, 128, 128)).float(),
             }
 
     class DataLoaderManager:
         """Manages PyTorch DataLoader creation with deterministic behavior."""
+
         def __init__(self, profile: Any):
             self.profile = profile
 
-        def get_dataloader(self, dataset: TorchDataset, batch_size: int, shuffle: bool = True) -> TorchDataLoader:
+        def get_dataloader(
+            self, dataset: TorchDataset, batch_size: int, shuffle: bool = True
+        ) -> TorchDataLoader:
             generator = torch.Generator()
-            if getattr(self.profile, 'name', '') in ['research', 'publication']:
+            if getattr(self.profile, "name", "") in ["research", "publication"]:
                 generator.manual_seed(42)
-                
+
             def seed_worker(worker_id):
-                import numpy as np
                 import random
+
+                import numpy as np
+
                 worker_seed = torch.initial_seed() % 2**32
                 np.random.seed(worker_seed)
                 random.seed(worker_seed)
@@ -117,9 +129,8 @@ try:
                 batch_size=batch_size,
                 shuffle=shuffle,
                 worker_init_fn=seed_worker,
-                generator=generator
+                generator=generator,
             )
 
 except ImportError:
     pass
-

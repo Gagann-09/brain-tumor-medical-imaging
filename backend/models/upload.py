@@ -1,7 +1,10 @@
-from sqlalchemy import Column, String, Integer, DateTime, Index
+from sqlalchemy import Column, DateTime, Integer, String
 from sqlalchemy.sql import func
-from .base import Base
+
 from schemas.upload import UploadState
+
+from .base import Base
+
 
 class UploadRecordModel(Base):
     __tablename__ = "upload_records"

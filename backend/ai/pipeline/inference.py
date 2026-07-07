@@ -1,4 +1,5 @@
 """Inference pipeline orchestration."""
+
 from typing import Any
 
 from ai.config.inference import InferenceConfig

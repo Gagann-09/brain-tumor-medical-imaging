@@ -9,13 +9,8 @@ class TrainingStrategy(abc.ABC):
     Abstract strategy for executing a training step, handling optimization,
     mixed precision scaling, and distributed synchronization.
     """
-    def __init__(
-        self,
-        optimizer: Any,
-        mixed_precision: Any,
-        hardware: Any,
-        event_bus: EventBus
-    ):
+
+    def __init__(self, optimizer: Any, mixed_precision: Any, hardware: Any, event_bus: EventBus):
         self.optimizer = optimizer
         self.mixed_precision = mixed_precision
         self.hardware = hardware
@@ -25,6 +20,7 @@ class TrainingStrategy(abc.ABC):
     def execute_step(self, model: Any, batch: Any, batch_idx: int) -> dict[str, float]:
         """Executes a single step (forward + backward + optimize) and returns metrics."""
         pass
+
 
 class StandardTrainingStrategy(TrainingStrategy):
     """Standard training loop strategy for typical supervised models (e.g. U-Net, ResNet)."""
@@ -46,6 +42,7 @@ class StandardTrainingStrategy(TrainingStrategy):
 
         return {"loss": loss.item(), **output.metrics}
 
+
 class GANUpdatePolicy(abc.ABC):
     """Abstract policy for deciding how many discriminator/generator steps to take."""
 
@@ -57,6 +54,7 @@ class GANUpdatePolicy(abc.ABC):
     def should_update_generator(self, batch_idx: int) -> bool:
         pass
 
+
 class AlternatingUpdatePolicy(GANUpdatePolicy):
     """Standard 1:1 alternating update policy."""
 
@@ -65,6 +63,7 @@ class AlternatingUpdatePolicy(GANUpdatePolicy):
 
     def should_update_generator(self, batch_idx: int) -> bool:
         return True
+
 
 class GANTrainingStrategy(TrainingStrategy):
     """Strategy for GAN training (handling multiple optimizers)."""
@@ -75,7 +74,7 @@ class GANTrainingStrategy(TrainingStrategy):
         mixed_precision: Any,
         hardware: Any,
         event_bus: EventBus,
-        update_policy: GANUpdatePolicy | None = None
+        update_policy: GANUpdatePolicy | None = None,
     ):
         super().__init__(optimizer, mixed_precision, hardware, event_bus)
         self.update_policy = update_policy or AlternatingUpdatePolicy()
@@ -88,7 +87,9 @@ class GANTrainingStrategy(TrainingStrategy):
 
         # 1. Discriminator Phase
         if self.update_policy.should_update_discriminator(batch_idx):
-            self.event_bus.publish(Event(EventType.DISCRIMINATOR_PHASE_STARTED, {"batch": batch_idx}))
+            self.event_bus.publish(
+                Event(EventType.DISCRIMINATOR_PHASE_STARTED, {"batch": batch_idx})
+            )
             self.event_bus.publish(Event(EventType.DISCRIMINATOR_STEP_START, {"batch": batch_idx}))
 
             self.optimizer.zero_grad("discriminator", set_to_none=True)
@@ -102,8 +103,15 @@ class GANTrainingStrategy(TrainingStrategy):
             metrics.update(d_output.metrics)
             total_loss += d_loss.item()
 
-            self.event_bus.publish(Event(EventType.DISCRIMINATOR_STEP_END, {"batch": batch_idx, "loss": d_loss.item()}))
-            self.event_bus.publish(Event(EventType.DISCRIMINATOR_PHASE_COMPLETED, {"batch": batch_idx, "loss": d_loss.item()}))
+            self.event_bus.publish(
+                Event(EventType.DISCRIMINATOR_STEP_END, {"batch": batch_idx, "loss": d_loss.item()})
+            )
+            self.event_bus.publish(
+                Event(
+                    EventType.DISCRIMINATOR_PHASE_COMPLETED,
+                    {"batch": batch_idx, "loss": d_loss.item()},
+                )
+            )
 
         # 2. Generator Phase
         if self.update_policy.should_update_generator(batch_idx):
@@ -121,8 +129,14 @@ class GANTrainingStrategy(TrainingStrategy):
             metrics.update(g_output.metrics)
             total_loss += g_loss.item()
 
-            self.event_bus.publish(Event(EventType.GENERATOR_STEP_END, {"batch": batch_idx, "loss": g_loss.item()}))
-            self.event_bus.publish(Event(EventType.GENERATOR_PHASE_COMPLETED, {"batch": batch_idx, "loss": g_loss.item()}))
+            self.event_bus.publish(
+                Event(EventType.GENERATOR_STEP_END, {"batch": batch_idx, "loss": g_loss.item()})
+            )
+            self.event_bus.publish(
+                Event(
+                    EventType.GENERATOR_PHASE_COMPLETED, {"batch": batch_idx, "loss": g_loss.item()}
+                )
+            )
 
         # Total loss reported to engine
         metrics["loss"] = total_loss

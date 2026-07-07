@@ -20,11 +20,13 @@ class HardwareManager(ABC):
         """Clear hardware caches (e.g., CUDA cache)."""
         pass
 
+
 class PyTorchHardwareManager(HardwareManager):
     """Implementation of HardwareManager for PyTorch."""
 
     def __init__(self, device_type: str = "cuda"):
         import torch
+
         self.device_type = device_type
         self.device = torch.device("cpu")
         self.device_ids = []
@@ -44,6 +46,7 @@ class PyTorchHardwareManager(HardwareManager):
         # In a real setup, we might set CUDA_VISIBLE_DEVICES or use torch.cuda.set_device
         if self.device.type == "cuda" and len(device_ids) > 0:
             import torch
+
             torch.cuda.set_device(device_ids[0])
 
     def to_device(self, tensor: Any) -> Any:
@@ -54,6 +57,7 @@ class PyTorchHardwareManager(HardwareManager):
 
     def empty_cache(self) -> None:
         import torch
+
         if self.device.type == "cuda":
             torch.cuda.empty_cache()
         elif self.device.type == "mps":

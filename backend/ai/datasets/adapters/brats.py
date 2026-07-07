@@ -21,12 +21,12 @@ class BraTSAdapter(BaseDatasetAdapter):
     """
 
     # Typical mapping in BraTS
-    BRATS_MODALITIES = ["t1", "t1ce", "t2", "flair"]
+    BRATS_MODALITIES = ["t1", "t1ce", "t2", "flair"]  # type: ignore  # type: ignore
     # 1: Necrotic, 2: Edema, 4: Enhancing (often mapped internally as needed)
-    BRATS_LABEL_MAP = {
+    BRATS_LABEL_MAP = {  # type: ignore  # type: ignore
         1: "Necrotic and Non-Enhancing Tumor Core",
         2: "Peritumoral Edema",
-        4: "GD-Enhancing Tumor"
+        4: "GD-Enhancing Tumor",
     }
 
     def load_studies(self) -> Iterator[MRIStudy]:
@@ -61,7 +61,7 @@ class BraTSAdapter(BaseDatasetAdapter):
                     zooms = nii.header.get_zooms()
                     voxel_sizes = tuple(float(z) for z in zooms[:3]) if zooms else None
             except Exception as e:
-                raise MedicalImagingError(f"Failed to load {mod_file}: {e!s}")
+                raise MedicalImagingError(f"Failed to load {mod_file}: {e!s}") from e
 
         if not volumes:
             raise MedicalImagingError(f"No valid modalities found in {patient_dir}")
@@ -77,15 +77,15 @@ class BraTSAdapter(BaseDatasetAdapter):
                 seg_annotation = SegmentationAnnotation(
                     mask=mask,
                     label_map=self.BRATS_LABEL_MAP,
-                    metadata={"source": seg_files[0].name}
+                    metadata={"source": seg_files[0].name},
                 )
                 annotations.append(seg_annotation)
             except Exception as e:
-                raise MedicalImagingError(f"Failed to load segmentation {seg_files[0]}: {e!s}")
+                raise MedicalImagingError(f"Failed to load segmentation {seg_files[0]}: {e!s}") from e
 
         return MRIStudy(
             primary_image=image,
             study_id=study_id,
-            patient_id=study_id, # In BraTS, study_id is usually patient_id
-            annotations=annotations
+            patient_id=study_id,  # In BraTS, study_id is usually patient_id
+            annotations=annotations,
         )

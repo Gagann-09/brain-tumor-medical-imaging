@@ -27,7 +27,7 @@ class MRIImage:
         Args:
             volumes: A dictionary mapping modality names (e.g., 'T1', 'T1ce', 'T2', 'FLAIR', 'mask')
                      to their corresponding 3D numpy arrays.
-            affine: The 4x4 affine transformation matrix relating voxel coordinates to world coordinates.
+            affine: The 4x4 affine transformation matrix relating voxel coordinates to world coordinates.  # noqa: E501
             voxel_sizes: The physical size of the voxels in mm (e.g., (1.0, 1.0, 1.0)).
             patient_metadata: Strongly typed patient metadata.
             study_metadata: Strongly typed study metadata.
@@ -63,7 +63,9 @@ class MRIImage:
     def get_volume(self, modality: str) -> np.ndarray:
         """Get the volume for a specific modality."""
         if modality not in self.volumes:
-            raise KeyError(f"Modality '{modality}' not found. Available modalities: {self.modalities}")
+            raise KeyError(
+                f"Modality '{modality}' not found. Available modalities: {self.modalities}"
+            )
         return self.volumes[modality]
 
     def add_volume(self, modality: str, volume: np.ndarray) -> None:
@@ -98,7 +100,7 @@ class SegmentationAnnotation(Annotation):
         self,
         mask: np.ndarray,
         label_map: dict[int, str] | None = None,
-        metadata: dict[str, Any] | None = None
+        metadata: dict[str, Any] | None = None,
     ):
         super().__init__(annotation_type="segmentation", metadata=metadata)
         self.mask = mask
@@ -115,7 +117,7 @@ class ClassificationAnnotation(Annotation):
         self,
         class_name: str,
         confidence: float | None = None,
-        metadata: dict[str, Any] | None = None
+        metadata: dict[str, Any] | None = None,
     ):
         super().__init__(annotation_type="classification", metadata=metadata)
         self.class_name = class_name
@@ -135,7 +137,7 @@ class MRIStudy:
         study_id: str,
         patient_id: str,
         annotations: list[Annotation] | None = None,
-        metadata: dict[str, Any] | None = None
+        metadata: dict[str, Any] | None = None,
     ):
         self.primary_image = primary_image
         self.study_id = study_id

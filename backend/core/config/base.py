@@ -21,7 +21,7 @@ class BaseConfig(BaseSettings):
 
     # ── Database ─────────────────────────────────────────
     DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/armt_gan"
-    
+
     # ── Redis ────────────────────────────────────────────
     REDIS_URL: str = "redis://localhost:6379/0"
 
@@ -76,4 +76,3 @@ class BaseConfig(BaseSettings):
         if self.STORAGE_BACKEND == "s3" and not self.S3_BUCKET:
             raise ValueError("S3_BUCKET is required when STORAGE_BACKEND is 's3'")
         return self
-

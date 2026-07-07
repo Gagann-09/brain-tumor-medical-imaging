@@ -20,7 +20,12 @@ class PatientRepository:
         return self.db.query(Patient).filter(Patient.medical_record_number == mrn).first()
 
     def create(
-        self, *, medical_record_number: str, full_name: str, created_by: UUID, **kwargs,
+        self,
+        *,
+        medical_record_number: str,
+        full_name: str,
+        created_by: UUID,
+        **kwargs,
     ) -> Patient:
         patient = Patient(
             medical_record_number=medical_record_number,

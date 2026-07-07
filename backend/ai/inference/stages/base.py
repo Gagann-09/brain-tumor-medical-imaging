@@ -1,15 +1,16 @@
 import abc
 import time
-from typing import Tuple
+
 from ai.inference.context import InferenceContext, StageDiagnostics, StageStatus
+
 
 class BaseStage(abc.ABC):
     """Abstract base class for all inference stages."""
-    
+
     def __init__(self, name: str):
         self.name = name
 
-    def run(self, context: InferenceContext) -> Tuple[InferenceContext, StageDiagnostics]:
+    def run(self, context: InferenceContext) -> tuple[InferenceContext, StageDiagnostics]:
         """Wrapper to record timing and handle execution."""
         start_time = time.time()
         try:
@@ -20,7 +21,7 @@ class BaseStage(abc.ABC):
                 stage_name=self.name,
                 status=diagnostics.status,
                 message=diagnostics.message,
-                timings_ms=timings_ms
+                timings_ms=timings_ms,
             )
             # Record timing in context
             new_timings = dict(new_context.timing_information)
@@ -32,12 +33,12 @@ class BaseStage(abc.ABC):
             diagnostics = StageDiagnostics(
                 stage_name=self.name,
                 status=StageStatus.FAILED,
-                message=f"Unhandled exception: {str(e)}",
-                timings_ms=timings_ms
+                message=f"Unhandled exception: {e!s}",
+                timings_ms=timings_ms,
             )
             return context, diagnostics
 
     @abc.abstractmethod
-    def execute(self, context: InferenceContext) -> Tuple[InferenceContext, StageDiagnostics]:
+    def execute(self, context: InferenceContext) -> tuple[InferenceContext, StageDiagnostics]:
         """Core logic of the stage. Returns a new immutable context and diagnostics."""
         pass

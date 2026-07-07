@@ -1,7 +1,8 @@
 """
 Converters package for converting between different formats and structures.
 """
-from typing import List
+
+
 
 import pydicom
 
@@ -17,4 +18,4 @@ def dicom_series_to_mri_image(datasets: list[pydicom.dataset.FileDataset]) -> MR
     try:
         return build_mri_image_from_dicom_series(datasets)
     except Exception as e:
-        raise MedicalImagingError(f"Failed to convert DICOM series to MRIImage: {e!s}")
+        raise MedicalImagingError(f"Failed to convert DICOM series to MRIImage: {e!s}") from e

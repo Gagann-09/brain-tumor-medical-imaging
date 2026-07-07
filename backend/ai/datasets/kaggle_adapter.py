@@ -1,19 +1,20 @@
-import os
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
+
+from ai.config.profiles import KAGGLE_PROFILE, DatasetProfile
 
 from .base import DatasetAdapter
-from ai.config.profiles import DatasetProfile, KAGGLE_PROFILE
+
 
 class KaggleDataset(DatasetAdapter):
     """Adapter for generic Kaggle medical imaging datasets."""
 
-    def __init__(self, data_dir: Optional[str] = None, profile: Optional[DatasetProfile] = None):
+    def __init__(self, data_dir: str | None = None, profile: DatasetProfile | None = None):
         self.profile = profile or KAGGLE_PROFILE
-        
+
         # Resolve dataset location: explicit data_dir > profile.data_dir
         self.root_dir = data_dir if data_dir else self.profile.data_dir
-        
+
         if not self.root_dir or not Path(self.root_dir).exists():
             raise ValueError(
                 f"Validation Error: Kaggle dataset path not found at '{self.root_dir}'.\n"

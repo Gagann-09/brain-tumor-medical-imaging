@@ -12,16 +12,18 @@ class BaseModel(ABC):
         """Load model weights from a specified path."""
         pass
 
+
 class SegmentationModel(BaseModel):
     """Abstract interface for segmentation models."""
 
     @abstractmethod
     def predict(self, image: MRIImage, **kwargs: Any) -> MRIImage:
         """
-        Run inference on the input image and return a new MRIImage 
+        Run inference on the input image and return a new MRIImage
         containing the segmentation masks.
         """
         pass
+
 
 class ClassificationModel(BaseModel):
     """Abstract interface for classification models."""
@@ -29,10 +31,11 @@ class ClassificationModel(BaseModel):
     @abstractmethod
     def predict(self, image: MRIImage, **kwargs: Any) -> dict[str, float]:
         """
-        Run inference on the input image and return classification 
+        Run inference on the input image and return classification
         probabilities or labels.
         """
         pass
+
 
 class ExplainabilityEngine(ABC):
     """Abstract interface for explainability and interpretability methods."""
@@ -40,7 +43,7 @@ class ExplainabilityEngine(ABC):
     @abstractmethod
     def explain(self, model: BaseModel, image: MRIImage, **kwargs: Any) -> MRIImage:
         """
-        Generate explainability heatmaps (e.g., Grad-CAM, Integrated Gradients) 
+        Generate explainability heatmaps (e.g., Grad-CAM, Integrated Gradients)
         and return them as volumes within an MRIImage.
         """
         pass

@@ -9,10 +9,11 @@ from .events import Event, EventBus, EventType
 
 class Callback(ABC):
     """
-    Base class for training callbacks. 
+    Base class for training callbacks.
     Callbacks register themselves with the EventBus to respond to lifecycle events.
     Priority determines the execution order (higher priority executes first).
     """
+
     priority: int = 0
 
     def register(self, event_bus: EventBus) -> None:
@@ -26,14 +27,30 @@ class Callback(ABC):
         event_bus.subscribe(EventType.EVALUATION_START, self.on_evaluation_start)
         event_bus.subscribe(EventType.EVALUATION_END, self.on_evaluation_end)
 
-    def on_training_start(self, event: Event) -> None: pass
-    def on_training_end(self, event: Event) -> None: pass
-    def on_epoch_start(self, event: Event) -> None: pass
-    def on_epoch_end(self, event: Event) -> None: pass
-    def on_batch_start(self, event: Event) -> None: pass
-    def on_batch_end(self, event: Event) -> None: pass
-    def on_evaluation_start(self, event: Event) -> None: pass
-    def on_evaluation_end(self, event: Event) -> None: pass
+    def on_training_start(self, event: Event) -> None:
+        pass
+
+    def on_training_end(self, event: Event) -> None:
+        pass
+
+    def on_epoch_start(self, event: Event) -> None:
+        pass
+
+    def on_epoch_end(self, event: Event) -> None:
+        pass
+
+    def on_batch_start(self, event: Event) -> None:
+        pass
+
+    def on_batch_end(self, event: Event) -> None:
+        pass
+
+    def on_evaluation_start(self, event: Event) -> None:
+        pass
+
+    def on_evaluation_end(self, event: Event) -> None:
+        pass
+
 
 class CallbackManager:
     """Manages callback registration to ensure deterministic ordering based on priority."""
@@ -54,8 +71,10 @@ class CallbackManager:
         for callback in self.callbacks:
             callback.register(self.event_bus)
 
+
 class CheckpointCallback(Callback):
     """Saves extensive checkpoints at the end of each epoch or if metric improves."""
+
     priority = 10  # Save after logging
 
     def __init__(
@@ -66,7 +85,7 @@ class CheckpointCallback(Callback):
         config: Any,
         monitor_metric: str = "val_loss",
         mode: str = "min",
-        keep_top_k: int = 3
+        keep_top_k: int = 3,
     ):
         self.save_dir = Path(save_dir)
         self.save_dir.mkdir(parents=True, exist_ok=True)
@@ -80,8 +99,8 @@ class CheckpointCallback(Callback):
         self.saved_checkpoints: list[tuple[float, str]] = []
 
     def on_epoch_end(self, event: Event) -> None:
-        metrics = event.data.get("metrics", {})
-        epoch = event.data.get("epoch", 0)
+        event.data.get("metrics", {})
+        event.data.get("epoch", 0)
 
         # We assume validation happens after training and fires EVALUATION_END,
         # but if we just hook into EPOCH_END, we check if validation metrics are passed.
@@ -95,7 +114,9 @@ class CheckpointCallback(Callback):
             return
 
         is_best = False
-        if (self.mode == "min" and val_metric < self.best_metric) or (self.mode == "max" and val_metric > self.best_metric):
+        if (self.mode == "min" and val_metric < self.best_metric) or (
+            self.mode == "max" and val_metric > self.best_metric
+        ):
             self.best_metric = val_metric
             is_best = True
 
@@ -104,6 +125,7 @@ class CheckpointCallback(Callback):
 
     def _save_checkpoint(self, val_metric: float, metrics: dict) -> None:
         import torch
+
         timestamp = int(time.time())
         filename = f"checkpoint_{timestamp}_{self.monitor_metric}_{val_metric:.4f}.pth"
         filepath = self.save_dir / filename
@@ -135,8 +157,10 @@ class CheckpointCallback(Callback):
             if os.path.exists(old_filepath):
                 os.remove(old_filepath)
 
+
 class ModelCardCallback(Callback):
     """Generates a Model Card at the end of training."""
+
     priority = 0
 
     def __init__(self, config: Any, model_details: Any, save_dir: str):
@@ -159,17 +183,29 @@ class ModelCardCallback(Callback):
             model_details=self.model_details,
             training_config=self.config.model_dump() if hasattr(self.config, "model_dump") else {},
             metrics=self.best_metrics,
-            dataset_info={"dataset_name": getattr(getattr(self.config, "dataset", None), "registry_id", "unknown")}
+            dataset_info={
+                "dataset_name": getattr(
+                    getattr(self.config, "dataset", None), "registry_id", "unknown"
+                )
+            },
         )
 
         card.save(self.save_dir / "model_card.json")
         card.export_markdown(self.save_dir / "model_card.md")
 
+
 class EarlyStoppingCallback(Callback):
     """Early stopping to terminate training when validation metric stops improving."""
+
     priority = 20
 
-    def __init__(self, patience: int = 5, monitor_metric: str = "val_loss", min_delta: float = 0.0, mode: str = "min"):
+    def __init__(
+        self,
+        patience: int = 5,
+        monitor_metric: str = "val_loss",
+        min_delta: float = 0.0,
+        mode: str = "min",
+    ):
         self.patience = patience
         self.monitor_metric = monitor_metric
         self.min_delta = min_delta
@@ -198,5 +234,3 @@ class EarlyStoppingCallback(Callback):
             self.wait += 1
             if self.wait >= self.patience:
                 event.data["stop_training"] = True
-                print(f"Early stopping triggered. Metric '{self.monitor_metric}' did not improve for {self.patience} epochs.")
-

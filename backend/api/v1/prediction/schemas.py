@@ -8,12 +8,14 @@ from pydantic import BaseModel
 
 class PredictionCreate(BaseModel):
     """Request to create a prediction."""
+
     study_id: UUID
     model_version: str = "v1.0.0"
 
 
 class PredictionResponse(BaseModel):
     """Response for prediction data."""
+
     id: UUID
     study_id: UUID
     model_version: str

@@ -24,16 +24,16 @@ def build_mri_image_from_dicom_series(datasets: list[pydicom.dataset.FileDataset
     # Map 'MR' to something more specific if possible, but keep it simple for now
     # Users can rename modalities later or we can add logic to infer T1/T2 from SeriesDescription
     modality_key = modality
-    if hasattr(first_ds, 'SeriesDescription'):
+    if hasattr(first_ds, "SeriesDescription"):
         desc = first_ds.SeriesDescription.lower()
-        if 't1' in desc and 'ce' in desc:
-            modality_key = 'T1ce'
-        elif 't1' in desc:
-            modality_key = 'T1'
-        elif 't2' in desc:
-            modality_key = 'T2'
-        elif 'flair' in desc:
-            modality_key = 'FLAIR'
+        if "t1" in desc and "ce" in desc:
+            modality_key = "T1ce"
+        elif "t1" in desc:
+            modality_key = "T1"
+        elif "t2" in desc:
+            modality_key = "T2"
+        elif "flair" in desc:
+            modality_key = "FLAIR"
 
     volumes = {modality_key: volume}
 
@@ -42,5 +42,5 @@ def build_mri_image_from_dicom_series(datasets: list[pydicom.dataset.FileDataset
         affine=affine,
         patient_metadata=patient_meta,
         study_metadata=study_meta,
-        image_metadata=image_meta
+        image_metadata=image_meta,
     )

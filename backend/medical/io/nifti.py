@@ -10,11 +10,11 @@ from medical.exceptions import CorruptedDataError
 def load_nifti(filepath: str | Path, modality: str = "UNKNOWN") -> MRIImage:
     """
     Load a NIfTI file into an MRIImage object.
-    
+
     Args:
         filepath: Path to the .nii or .nii.gz file.
         modality: The modality of the image (e.g., 'T1', 'T2', 'FLAIR').
-        
+
     Returns:
         MRIImage object.
     """
@@ -39,10 +39,11 @@ def load_nifti(filepath: str | Path, modality: str = "UNKNOWN") -> MRIImage:
             volumes=volumes,
             affine=affine,
             voxel_sizes=voxel_sizes,
-            custom_metadata={"nifti_header": header}
+            custom_metadata={"nifti_header": header},
         )
     except Exception as e:
-        raise CorruptedDataError(f"Failed to read NIfTI file {path}: {e!s}")
+        raise CorruptedDataError(f"Failed to read NIfTI file {path}: {e!s}") from e
+
 
 def save_nifti(image: MRIImage, filepath: str | Path, modality: str) -> None:
     """

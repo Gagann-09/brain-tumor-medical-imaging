@@ -1,11 +1,12 @@
 """Model factory abstraction."""
+
 from typing import Any
 
 
 class ModelFactory:
     """Abstract factory for creating AI models dynamically."""
 
-    _builders: dict[str, Any] = {}
+    _builders: dict[str, Any] = {}  # type: ignore  # type: ignore
 
     @classmethod
     def register_builder(cls, architecture_name: str, builder_func: Any) -> None:

@@ -20,7 +20,11 @@ class UserRepository:
         return self.db.query(User).filter(User.email == email).first()
 
     def create(
-        self, email: str, hashed_password: str, full_name: str, role: str = "viewer",
+        self,
+        email: str,
+        hashed_password: str,
+        full_name: str,
+        role: str = "viewer",
     ) -> User:
         user = User(
             email=email,
@@ -34,13 +38,7 @@ class UserRepository:
         return user
 
     def list_active(self, skip: int = 0, limit: int = 20) -> list[User]:
-        return (
-            self.db.query(User)
-            .filter(User.is_active.is_(True))
-            .offset(skip)
-            .limit(limit)
-            .all()
-        )
+        return self.db.query(User).filter(User.is_active.is_(True)).offset(skip).limit(limit).all()
 
     def deactivate(self, user_id: UUID) -> User | None:
         user = self.get_by_id(user_id)

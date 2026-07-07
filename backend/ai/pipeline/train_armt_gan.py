@@ -42,6 +42,7 @@ class DummyMixedPrecision(MixedPrecisionManager):
         self.scaler.step(optimizer)
         self.scaler.update()
 
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_dir", type=str, required=True)
@@ -53,7 +54,7 @@ def main():
         dataset=DatasetConfig(name="BraTS", data_dir=args.data_dir, batch_size=2),
         optimizer=OptimizerConfig(name="AdamW", learning_rate=2e-4),
         hardware=HardwareConfig(device="cuda"),
-        experiment_name="brats_armt_gan"
+        experiment_name="brats_armt_gan",
     )
 
     # Dataset
@@ -61,29 +62,41 @@ def main():
     studies = list(adapter.load_studies())
 
     split_manager = DatasetSplitManager(PatientSplitStrategy(seed=config.seed))
-    train_studies, val_studies, _ = split_manager.create_splits(studies, train_ratio=0.8, val_ratio=0.2)
+    train_studies, val_studies, _ = split_manager.create_splits(
+        studies, train_ratio=0.8, val_ratio=0.2
+    )
 
-    train_loader = torch.utils.data.DataLoader(PyTorchDatasetAdapter(TrainingDataset(train_studies)), batch_size=config.dataset.batch_size, shuffle=True)
-    val_loader = torch.utils.data.DataLoader(PyTorchDatasetAdapter(ValidationDataset(val_studies)), batch_size=config.dataset.batch_size, shuffle=False)
+    train_loader = torch.utils.data.DataLoader(
+        PyTorchDatasetAdapter(TrainingDataset(train_studies)),
+        batch_size=config.dataset.batch_size,
+        shuffle=True,
+    )
+    val_loader = torch.utils.data.DataLoader(
+        PyTorchDatasetAdapter(ValidationDataset(val_studies)),
+        batch_size=config.dataset.batch_size,
+        shuffle=False,
+    )
 
     # Loss Manager
     def g_bce(fake_preds, **kwargs):
         import torch.nn.functional as F
+
         return F.binary_cross_entropy_with_logits(fake_preds, torch.ones_like(fake_preds))
 
     def g_l1(fake_masks, real_masks, **kwargs):
         import torch.nn.functional as F
+
         return F.l1_loss(fake_masks, real_masks)
 
     def d_bce(real_preds, fake_preds, **kwargs):
         import torch.nn.functional as F
+
         real_loss = F.binary_cross_entropy_with_logits(real_preds, torch.ones_like(real_preds))
         fake_loss = F.binary_cross_entropy_with_logits(fake_preds, torch.zeros_like(fake_preds))
         return (real_loss + fake_loss) / 2.0
 
     loss_mgr = AdversarialLossManager(
-        g_losses={"bce": (g_bce, 1.0), "l1": (g_l1, 10.0)},
-        d_losses={"bce": (d_bce, 1.0)}
+        g_losses={"bce": (g_bce, 1.0), "l1": (g_l1, 10.0)}, d_losses={"bce": (d_bce, 1.0)}
     )
 
     # Model
@@ -103,7 +116,7 @@ def main():
         mixed_precision=mixed_precision,
         hardware=hardware_manager,
         event_bus=None,
-        update_policy=AlternatingUpdatePolicy()
+        update_policy=AlternatingUpdatePolicy(),
     )
 
     manager = TrainingManager(
@@ -112,22 +125,24 @@ def main():
         strategy=strategy,
         train_loader=train_loader,
         val_loader=val_loader,
-        hardware_manager=hardware_manager
+        hardware_manager=hardware_manager,
     )
     strategy.event_bus = manager.event_bus
 
     save_dir = Path(args.output_dir) / config.experiment_name
-    manager.register_callback(CheckpointCallback(
-        save_dir=str(save_dir / "checkpoints"),
-        model=model,
-        strategy=strategy,
-        config=config,
-        monitor_metric="val_dice",
-        mode="max"
-    ))
+    manager.register_callback(
+        CheckpointCallback(
+            save_dir=str(save_dir / "checkpoints"),
+            model=model,
+            strategy=strategy,
+            config=config,
+            monitor_metric="val_dice",
+            mode="max",
+        )
+    )
 
     manager.start_training()
-    print("ARMT-GAN training finished.")
+
 
 if __name__ == "__main__":
     main()

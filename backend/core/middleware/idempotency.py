@@ -1,13 +1,15 @@
 """Idempotency-key middleware."""
 
+import redis.asyncio as redis
 import structlog
 from fastapi import Request, Response
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
-import redis.asyncio as redis
+
 from core.config import get_settings
 
 logger = structlog.get_logger()
+
 
 class IdempotencyMiddleware(BaseHTTPMiddleware):
     """Ensures POST requests with Idempotency-Key are only processed once."""
@@ -37,12 +39,14 @@ class IdempotencyMiddleware(BaseHTTPMiddleware):
                 logger.info("idempotency_key_duplicate", key=idempotency_key)
                 return JSONResponse(
                     status_code=409,
-                    content={"error": {"type": "Conflict", "message": "Duplicate request detected"}}
+                    content={
+                        "error": {"type": "Conflict", "message": "Duplicate request detected"}
+                    },
                 )
-            
+
             # Expire after 24 hours to avoid indefinite storage
             await self.redis.expire(cache_key, 86400)
-            
+
             response = await call_next(request)
             # Future enhancement: save the response here so subsequent requests get the same response
             return response

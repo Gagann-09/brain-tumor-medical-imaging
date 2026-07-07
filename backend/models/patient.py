@@ -2,18 +2,23 @@
 
 import uuid
 
-from sqlalchemy import Column, Date, DateTime, ForeignKey, String, Text, Index
+from sqlalchemy import Column, Date, DateTime, ForeignKey, Index, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 
 from .base import Base
-from .mixins import SoftDeleteMixin, OptimisticLockingMixin
+from .mixins import OptimisticLockingMixin, SoftDeleteMixin
 
 
 class Patient(SoftDeleteMixin, OptimisticLockingMixin, Base):
     __tablename__ = "patients"
     __table_args__ = (
-        Index("ix_patients_medical_record_number_not_deleted", "medical_record_number", unique=True, postgresql_where="(is_deleted IS FALSE)"),
+        Index(
+            "ix_patients_medical_record_number_not_deleted",
+            "medical_record_number",
+            unique=True,
+            postgresql_where="(is_deleted IS FALSE)",
+        ),
     )
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)

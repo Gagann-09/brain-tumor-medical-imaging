@@ -1,7 +1,6 @@
 """SQLAlchemy mixins for common patterns."""
 
-from sqlalchemy import Column, DateTime, Integer, Boolean
-from sqlalchemy.sql import func
+from sqlalchemy import Boolean, Column, DateTime, Integer
 
 
 class SoftDeleteMixin:
@@ -16,7 +15,7 @@ class OptimisticLockingMixin:
 
     version_id = Column(Integer, nullable=False, default=1)
 
-    __mapper_args__ = {
+    __mapper_args__ = {  # type: ignore
         "version_id_col": version_id,
         "version_id_generator": False,
     }

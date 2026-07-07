@@ -20,7 +20,13 @@ class StudyRepository:
         return self.db.query(Study).filter(Study.patient_id == patient_id).all()
 
     def create(
-        self, *, patient_id: UUID, study_type: str, file_path: str, uploaded_by: UUID, **kwargs,
+        self,
+        *,
+        patient_id: UUID,
+        study_type: str,
+        file_path: str,
+        uploaded_by: UUID,
+        **kwargs,
     ) -> Study:
         study = Study(
             patient_id=patient_id,

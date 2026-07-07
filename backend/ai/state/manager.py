@@ -1,17 +1,20 @@
 """State management for AI lifecycles."""
+
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 
-class AIModelState(str, Enum):
+class AIModelState(StrEnum):
     """Enumeration of model lifecycle states."""
+
     TRAINING = "Training"
     EVALUATING = "Evaluating"
     READY = "Ready"
     SERVING = "Serving"
     ARCHIVED = "Archived"
     FAILED = "Failed"
+
 
 class AIStateManager:
     """Tracks and transitions model lifecycle states."""
@@ -20,12 +23,14 @@ class AIStateManager:
         # Placeholder for DB/Redis state storage
         self._states: dict[str, dict[str, Any]] = {}
 
-    def set_state(self, model_id: str, state: AIModelState, metadata: dict[str, Any] | None = None) -> None:
+    def set_state(
+        self, model_id: str, state: AIModelState, metadata: dict[str, Any] | None = None
+    ) -> None:
         """Update the state of a model."""
         self._states[model_id] = {
             "state": state,
             "updated_at": datetime.utcnow(),
-            "metadata": metadata or {}
+            "metadata": metadata or {},
         }
 
     def get_state(self, model_id: str) -> AIModelState:

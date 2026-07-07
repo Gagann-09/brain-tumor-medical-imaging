@@ -1,6 +1,6 @@
 """Shared Pydantic response envelopes used across all endpoints."""
 
-from typing import TypeVar, Generic
+from typing import Generic, TypeVar
 
 from pydantic import BaseModel
 
