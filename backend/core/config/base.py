@@ -1,5 +1,6 @@
 """Base configuration with pydantic-settings - all defaults live here."""
 
+from pathlib import Path
 from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -45,10 +46,17 @@ class BaseConfig(BaseSettings):
     S3_ACCESS_KEY_ID: str = ""
     S3_SECRET_ACCESS_KEY: str = ""
 
+    # ── Project Root ──────────────────────────────────────
+    # Canonical project root: backend/ sits one level below the repo root.
+    PROJECT_ROOT: str = str(Path(__file__).resolve().parent.parent.parent.parent)
+
     # ── Datasets ─────────────────────────────────────────
-    BRA_TS_DEV_PATH: str = "./datasets/brats_2020_subset"
-    BRA_TS_FULL_PATH: str = "./datasets/brats_2020_full"
-    KAGGLE_DATASET_PATH: str = "./datasets/kaggle_brain_mri"
+    # Defaults are computed in _resolve_dataset_paths below.
+    # Set these environment variables to override the canonical repo-local paths.
+    DATASET_ROOT: str = ""
+    BRA_TS_DEV_PATH: str = ""
+    BRA_TS_FULL_PATH: str = ""
+    KAGGLE_DATASET_PATH: str = ""
 
     # ── Rate Limiting ────────────────────────────────────
     RATE_LIMIT_GLOBAL: str = "100/minute"
@@ -69,6 +77,20 @@ class BaseConfig(BaseSettings):
     UPLOAD_RETENTION_DAYS: int = 7
     JOB_RETENTION_DAYS: int = 30
     MAX_RETRIES: int = 3
+
+    @model_validator(mode="after")
+    def _resolve_dataset_paths(self) -> "BaseConfig":
+        """Resolve dataset paths from PROJECT_ROOT when not explicitly set via env vars."""
+        dataset_root = Path(self.PROJECT_ROOT) / "datasets"
+        if not self.DATASET_ROOT:
+            self.DATASET_ROOT = str(dataset_root)
+        if not self.BRA_TS_DEV_PATH:
+            self.BRA_TS_DEV_PATH = str(dataset_root / "brats2020_dev")
+        if not self.BRA_TS_FULL_PATH:
+            self.BRA_TS_FULL_PATH = str(dataset_root / "brats2020_full")
+        if not self.KAGGLE_DATASET_PATH:
+            self.KAGGLE_DATASET_PATH = str(dataset_root / "kaggle_brain_mri")
+        return self
 
     @model_validator(mode="after")
     def validate_config(self) -> "BaseConfig":

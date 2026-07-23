@@ -6,6 +6,7 @@ from pathlib import Path
 from pydantic import BaseModel, Field
 
 from ai.datasets.provenance import DatasetProvenanceManager
+from core.config import get_settings
 from medical.exceptions import MedicalImagingError
 
 logger = logging.getLogger(__name__)
@@ -63,6 +64,13 @@ class DatasetRegistry:
         self._validate_registry()
         self._loaded = True
 
+    def _resolve_path(self, raw_path: str) -> Path:
+        """Resolve a registry path relative to PROJECT_ROOT."""
+        p = Path(raw_path)
+        if p.is_absolute():
+            return p
+        return Path(get_settings().PROJECT_ROOT) / p
+
     def _validate_registry(self):
         """Validate the registry at startup."""
         identifiers = set()
@@ -76,9 +84,10 @@ class DatasetRegistry:
             # Note: We won't strictly enforce dataset_path existence here to allow
             # environments without the dataset downloaded to still parse the registry,
             # but we can warn.
-            if not Path(entry.dataset_path).exists():
+            resolved = self._resolve_path(entry.dataset_path)
+            if not resolved.exists():
                 logger.warning(
-                    f"Dataset path {entry.dataset_path} for {entry.dataset_identifier} does not exist."
+                    f"Dataset path {resolved} for {entry.dataset_identifier} does not exist."
                 )
 
             if not Path(entry.split_manifest).exists():
@@ -103,15 +112,16 @@ class DatasetRegistry:
         # Hybrid Fingerprint Strategy
         if not entry.dataset_fingerprint:
             logger.info(f"Computing {entry.fingerprint_mode} fingerprint for {registry_id}...")
-            if Path(entry.dataset_path).exists():
+            resolved = self._resolve_path(entry.dataset_path)
+            if resolved.exists():
                 fp = DatasetProvenanceManager.generate_fingerprint(
-                    entry.dataset_path, mode=entry.fingerprint_mode
+                    str(resolved), mode=entry.fingerprint_mode
                 )
                 entry.dataset_fingerprint = fp
                 entry.last_verified = datetime.utcnow().isoformat()
                 self._save_registry()
             else:
-                logger.warning(f"Cannot compute fingerprint, path {entry.dataset_path} is missing.")
+                logger.warning(f"Cannot compute fingerprint, path {resolved} is missing.")
 
         return entry
 
