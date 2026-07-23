@@ -13,6 +13,7 @@ Desktop.ini
 *.swo
 *~
 .openclaude-profile.json
+.ipynb_checkpoints/
 
 # Python
 __pycache__/
@@ -23,19 +24,14 @@ __pycache__/
 *.egg-info/
 .eggs/
 *.whl
-build/
-dist/
-sdist/
 develop-eggs/
 .installed.cfg
 .Python
+.python-version
 pip-log.txt
 pip-delete-this-directory.txt
-.venv/
-venv/
-.python-version
 
-# Node
+# Node / Frontend
 node_modules/
 .next/
 out/
@@ -49,26 +45,35 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # Virtual Environments
-# (Handled in Python section: .venv/, venv/)
+.venv/
+venv/
+
+# Logs
+*.log
+/logs/
+/tb_logs/
+
+# Testing / Coverage
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+.nox/
+.hypothesis/
+.mypy_cache/
+.ruff_cache/
 
 # Build Artifacts
-# (Handled in Python/Node sections: build/, dist/, out/)
+build/
+dist/
+sdist/
+/temp/
+/tmp/
+*.tmp
+*.bak
+optuna_tmp/
 
-# Runtime Outputs
-/outputs/
-/backend/outputs_val/
-/outputs_val/
-/results/
-/test_inference_output/
-/test_robustness_output/
-/test_xai_output/
-/generated/
-/openapi/
-/profiler/
-/profiling/
-/traces/
-
-# ML Artifacts
+# ML / AI Outputs
 *.pth
 *.pt
 *.onnx
@@ -85,8 +90,35 @@ yarn-error.log*
 *.tflite
 *.mlmodel
 *.weights
+/outputs/
+/backend/outputs_val/
+/outputs_val/
+/results/
+/test_inference_output/
+/test_robustness_output/
+/test_xai_output/
+/generated/
+/openapi/
+/profiler/
+/profiling/
+/traces/
+/visualizations/
+generated_*.png
+overlay_*.png
+*overlay*.png
+*visualization*.png
+*.png
+!docs/assets/**/*.png
 
-# Experiment Outputs
+# Models & Checkpoints
+models/**
+!models/README.md
+!models/**/.gitkeep
+/checkpoints/
+/best_models/
+/exports/
+
+# Experiment Tracking
 experiments/**/outputs/
 experiments/**/plots/
 experiments/**/reports/
@@ -94,68 +126,47 @@ experiments/**/benchmarks/
 /experiments/
 /experiment_outputs/
 /mlruns/
+backend/mlruns/
 /mlartifacts/
+/artifacts/
+wandb/
+.wandb/
+/.wandb/
+runs/
+events.out.tfevents*
+/tensorboard/
+/ray_results/
+mlflow.db
+/benchmark_outputs/
+benchmark.json
+benchmark.csv
+benchmark.md
+*_benchmark_summary.csv
+*_benchmark_summary.json
+/reports/
+/reports/generated/
+/comparison_outputs/
+backend/experiments/
+provenance.json
+metrics.json
+metrics.jsonl
+model_card.json
+model_card.md
+model_card_*.md
+model_card_*.json
+dataset_health_report.md
+failure_analysis.md
+comparison_report.md
+*_health_report.json
+*_health_report.html
+*_comparison_report.json
+*_comparison_report.html
+*_validation_report.json
+*_validation_report.md
+*_validation_report.html
+*_report.html
 
-# Logs
-*.log
-/logs/
-
-# Coverage
-.coverage
-htmlcov/
-
-# Testing
-.pytest_cache/
-.tox/
-.nox/
-.hypothesis/
-.mypy_cache/
-.ruff_cache/
-
-# Docker
-.docker/
-docker-compose.override.yml
-
-# Temporary Files
-/temp/
-/tmp/
-*.tmp
-*.bak
-.ipynb_checkpoints/
-optuna_tmp/
-
-# Local Configuration
-*.local.yml
-*.local.yaml
-*.local.json
-kubeconfig
-*.kubeconfig
-create_structure.py
-*.sqlite
-*.sqlite3
-*.db
-*.db3
-dump.rdb
-appendonly.aof
-*.prof
-*.profraw
-*.profdata
-*.fingerprint
-
-# Secrets
-.env
-.env.local
-.env.*
-!.env.example
-!.env.production.example
-*.pem
-*.key
-*.crt
-*.csr
-*.p12
-*.pfx
-
-# Dataset Storage
+# Datasets
 datasets/**
 !datasets/README.md
 !datasets/**/.gitkeep
@@ -177,78 +188,43 @@ datasets/**
 *.zraw
 *.nrrd
 
-# Model Storage
-models/**
-!models/README.md
-!models/**/.gitkeep
-/checkpoints/
-/best_models/
-/exports/
+# Secrets
+.env
+.env.local
+.env.*
+!.env.example
+!.env.production.example
+*.pem
+*.key
+*.crt
+*.csr
+*.p12
+*.pfx
 
-# Benchmark Outputs
-/benchmark_outputs/
-benchmark.json
-benchmark.csv
-benchmark.md
-*_benchmark_summary.csv
-*_benchmark_summary.json
+# Docker
+.docker/
+docker-compose.override.yml
 
-# Visualizations
-/visualizations/
-generated_*.png
-overlay_*.png
-*overlay*.png
-*visualization*.png
-*.png
-# Overrides for docs images
-!docs/assets/**/*.png
-
-# Generated Reports
-/reports/
-/reports/generated/
-/comparison_outputs/
-provenance.json
-metrics.json
-metrics.jsonl
-model_card.json
-model_card.md
-model_card_*.md
-model_card_*.json
-dataset_health_report.md
-failure_analysis.md
-comparison_report.md
-*_health_report.json
-*_health_report.html
-*_comparison_report.json
-*_comparison_report.html
-*_validation_report.json
-*_validation_report.md
-*_validation_report.html
-*_report.html
-
-# Weights & Biases
-wandb/
-/.wandb/
-
-# TensorBoard
-runs/
-events.out.tfevents*
-/tensorboard/
-/tb_logs/
-
-# Ray
-/ray_results/
-
-# MLflow Database
-mlflow.db
-
-# Added automatically
+# Misc
+*.local.yml
+*.local.yaml
+*.local.json
+kubeconfig
+*.kubeconfig
+create_structure.py
+*.sqlite
+*.sqlite3
+*.db
+*.db3
+dump.rdb
+appendonly.aof
+*.prof
+*.profraw
+*.profdata
+*.fingerprint
 celerybeat-schedule.*
 ruff_*.json
 ruff_*.txt
 remaining_violations.txt
 openapi_schema.json
 /diagnostics/
-backend/mlruns/
-backend/experiments/
-
