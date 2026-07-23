@@ -234,3 +234,50 @@ class EarlyStoppingCallback(Callback):
             self.wait += 1
             if self.wait >= self.patience:
                 event.data["stop_training"] = True
+
+class RuntimeMonitorCallback(Callback):
+    """Monitors RAM, CPU, VRAM, and latencies."""
+    priority = 5
+
+    def __init__(self):
+        import psutil
+        self.process = psutil.Process()
+        self.epoch_start_time = 0
+        self.batch_start_time = 0
+
+    def on_epoch_start(self, event: Event) -> None:
+        self.epoch_start_time = time.time()
+
+    def on_batch_start(self, event: Event) -> None:
+        self.batch_start_time = time.time()
+
+    def on_batch_end(self, event: Event) -> None:
+        batch_latency = time.time() - self.batch_start_time
+        metrics = event.data.setdefault("metrics", {})
+        metrics["batch_latency"] = batch_latency
+
+    def on_epoch_end(self, event: Event) -> None:
+        import torch
+        epoch_latency = time.time() - self.epoch_start_time
+        metrics = event.data.setdefault("metrics", {})
+        metrics["epoch_latency"] = epoch_latency
+
+        cpu_percent = self.process.cpu_percent()
+        ram_info = self.process.memory_info()
+        metrics["cpu_percent"] = cpu_percent
+        metrics["ram_mb"] = ram_info.rss / (1024 * 1024)
+
+        if torch.cuda.is_available():
+            metrics["vram_mb"] = torch.cuda.memory_allocated() / (1024 * 1024)
+            metrics["vram_max_mb"] = torch.cuda.max_memory_allocated() / (1024 * 1024)
+
+class TrainingHealthCallback(Callback):
+    """Monitors for NaNs, infs, and gradient health."""
+    priority = 99
+
+    def on_batch_end(self, event: Event) -> None:
+        import math
+        loss = event.data.get("loss")
+        if loss is not None:
+            if math.isnan(loss) or math.isinf(loss):
+                raise RuntimeError(f"TrainingHealthCallback: NaN or Inf loss detected! Loss = {loss}")

@@ -31,9 +31,9 @@ class UNet3D(BaseModel):
             predictions=[
                 {
                     "case_id": "mock_case",
-                    "image": batch["inputs"][0, 0].numpy(),
-                    "gt": batch["targets"][0, 0].numpy(),
-                    "pred": batch["targets"][0, 0].numpy(),
+                    "image": batch["image"][0, 0].numpy(),
+                    "gt": batch["label"][0, 0].numpy(),
+                    "pred": batch["label"][0, 0].numpy(),
                     "dice": 0.5,
                     "hausdorff": 1.0,
                     "pred_sum": 10,

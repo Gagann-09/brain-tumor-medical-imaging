@@ -9,6 +9,31 @@ from medical.exceptions import MedicalImagingError
 from .base import BaseDatasetAdapter
 
 
+class NiftiArrayProxy:
+    """
+    A lightweight proxy that acts like a numpy array but delays loading the NIfTI
+    data from disk until it is explicitly converted into an array (e.g., via np.array
+    or np.stack). This prevents the ArrayMemoryError during dataset discovery.
+    """
+
+    def __init__(self, path: str, dtype=np.float32):
+        self.path = path
+        self.dtype = dtype
+
+    @property
+    def shape(self) -> tuple[int, ...]:
+        # Fast read of just the header, no data loaded into memory
+        return nib.load(self.path).shape
+
+    def __array__(self, dtype=None) -> np.ndarray:
+        # Load the array into memory when evaluated
+        nii = nib.load(self.path)
+        arr = np.array(nii.get_fdata()).astype(self.dtype)
+        if dtype is not None:
+            arr = arr.astype(dtype)
+        return arr
+
+
 class BraTSAdapter(BaseDatasetAdapter):
     """
     Adapter for the BraTS (Brain Tumor Segmentation) dataset.
@@ -53,9 +78,12 @@ class BraTSAdapter(BaseDatasetAdapter):
 
             mod_file = mod_files[0]
             try:
+                # Load header to extract affine and voxel sizes
                 nii = nib.load(str(mod_file))
-                volume = np.array(nii.get_fdata(dtype=np.float32))
-                volumes[mod.upper()] = volume
+
+                # Assign proxy instead of loading the full volume into RAM
+                volumes[mod.upper()] = NiftiArrayProxy(str(mod_file), dtype=np.float32)
+
                 if affine is None:
                     affine = nii.affine
                     zooms = nii.header.get_zooms()
@@ -72,10 +100,10 @@ class BraTSAdapter(BaseDatasetAdapter):
         seg_files = list(patient_dir.glob("*seg.nii*"))
         if seg_files:
             try:
-                nii_seg = nib.load(str(seg_files[0]))
-                mask = np.array(nii_seg.get_fdata(dtype=np.uint8))
+                # Assign proxy instead of loading the full segmentation volume into RAM
+                mask_proxy = NiftiArrayProxy(str(seg_files[0]), dtype=np.uint8)
                 seg_annotation = SegmentationAnnotation(
-                    mask=mask,
+                    mask=mask_proxy,
                     label_map=self.BRATS_LABEL_MAP,
                     metadata={"source": seg_files[0].name},
                 )

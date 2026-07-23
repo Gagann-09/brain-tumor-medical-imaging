@@ -43,6 +43,27 @@ class MixedPrecisionManager(ABC):
         pass
 
 
+class PyTorchMixedPrecisionManager(MixedPrecisionManager):
+    """Concrete implementation of MixedPrecisionManager for PyTorch."""
+
+    def __init__(self, device_type: str = "cuda"):
+        import torch
+        self.device_type = device_type
+        self.scaler = torch.amp.GradScaler(enabled=(device_type == "cuda"))
+
+    def autocast(self) -> Any:
+        import torch
+        return torch.amp.autocast(device_type=self.device_type, dtype=torch.float16)
+
+    def scale_loss(self, loss: Any) -> Any:
+        return self.scaler.scale(loss)
+
+    def step_optimizer(self, optimizer: Any) -> None:
+        self.scaler.step(optimizer)
+        self.scaler.update()
+
+
+
 class DistributedStrategy(ABC):
     """Abstract interface for handling multi-GPU or multi-node training."""
 
