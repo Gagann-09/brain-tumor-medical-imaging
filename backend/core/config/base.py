@@ -1,6 +1,7 @@
 """Base configuration with pydantic-settings - all defaults live here."""
 
 from pathlib import Path
+
 from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 

@@ -102,26 +102,26 @@ def run_validation():
             class_count = len(stats.get("class_distribution", {}))
             validation_status = stats.get("outcome", "Unknown")
 
-            print(f"{display_name:<20}{str(resolved_path):<60}{exists:<10}{case_count:<14}{image_count:<14}{class_count:<14}{validation_status}")
+            print(f"{display_name:<20}{resolved_path!s:<60}{exists:<10}{case_count:<14}{image_count:<14}{class_count:<14}{validation_status}")
 
             report["datasets"][dataset_name] = stats
 
         except Exception as e:
             resolved_path = Path(profile.data_dir).resolve() if profile.data_dir else Path("N/A")
             exists = "No"
-            print(f"{display_name:<20}{str(resolved_path):<60}{exists:<10}{'N/A':<14}{'N/A':<14}{'N/A':<14}Fail")
+            print(f"{display_name:<20}{resolved_path!s:<60}{exists:<10}{'N/A':<14}{'N/A':<14}{'N/A':<14}Fail")
             report["datasets"][dataset_name] = {"outcome": "Fail", "error": str(e)}
 
     # Summary output matching expected format
     print("\n")
     for dataset_name, profile, display_name in profiles_to_validate:
-        adapter_data = report["datasets"].get(dataset_name, {})
+        report["datasets"].get(dataset_name, {})
         resolved = Path(profile.data_dir).resolve() if profile.data_dir else Path("N/A")
         exists = "Yes" if resolved.exists() else "No"
         print(f"{display_name}")
-        print(f"Resolved:")
+        print("Resolved:")
         print(f"{resolved}")
-        print(f"Exists:")
+        print("Exists:")
         print(f"{exists}")
         print()
 

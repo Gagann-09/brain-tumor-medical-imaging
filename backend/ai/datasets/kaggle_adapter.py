@@ -30,7 +30,7 @@ class KaggleDataset(DatasetAdapter):
         root_path = Path(self.root_dir)
         if not root_path.exists():
             return
-            
+
         for class_dir in root_path.iterdir():
             if class_dir.is_dir():
                 class_name = class_dir.name
