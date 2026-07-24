@@ -9,11 +9,15 @@ import torch.optim as optim
 from ai.config.profiles import DatasetProfileName, get_profile
 from ai.config.training_config import ExperimentConfig
 from ai.dataset_registry.registry import DatasetRegistry
+from ai.experiment_tracking.callbacks import ExperimentManagerCallback
+from ai.experiment_tracking.experiment_manager import ExperimentManager
 from ai.models.unet import UNet3D
 from ai.training.callbacks import (
     CheckpointCallback,
     EarlyStoppingCallback,
     ModelCardCallback,
+    RuntimeMonitorCallback,
+    TrainingHealthCallback,
 )
 from ai.training.data import DataLoaderManager, PyTorchDatasetAdapter
 from ai.training.manager import TrainingManager
@@ -29,6 +33,9 @@ def parse_args():
     )
     parser.add_argument(
         "--epochs", type=int, default=None, help="Override profile epochs (req for research)"
+    )
+    parser.add_argument(
+        "--resume_from", type=str, default=None, help="Path to checkpoint .pth file to resume from"
     )
     return parser.parse_args()
 
@@ -83,8 +90,17 @@ def main():
 
     hardware = DummyHardwareManager()
     model = UNet3D(in_channels=4, out_channels=3)
-
     optimizer = optim.Adam(model.parameters(), lr=1e-4)
+
+    start_epoch = 1
+    if args.resume_from:
+        print(f"Resuming from checkpoint: {args.resume_from}")
+        checkpoint = torch.load(args.resume_from, map_location="cpu", weights_only=False)
+        model.load_state_dict(checkpoint["model_state"])
+        if checkpoint.get("optimizer_state"):
+            optimizer.load_state_dict(checkpoint["optimizer_state"])
+        if "epoch" in checkpoint: # Not strictly standard but helpful if present
+            start_epoch = checkpoint["epoch"] + 1
 
     class DummyMixedPrecision:
         def autocast(self):
@@ -121,7 +137,18 @@ def main():
 
     strategy.event_bus = manager.event_bus
 
+    manager.register_callback(RuntimeMonitorCallback())
+    manager.register_callback(TrainingHealthCallback())
     manager.register_callback(EarlyStoppingCallback(patience=5, monitor_metric="val_dice_mean"))
+
+    # ExperimentManager integration
+    em = ExperimentManager(base_dir="outputs/experiments")
+    em_callback = ExperimentManagerCallback(
+        experiment_manager=em,
+        checkpoint_dir=f"outputs/{config.logging.experiment_name}/checkpoints",
+        artifact_dir=f"outputs/{config.logging.experiment_name}",
+    )
+    manager.register_callback(em_callback)
 
     manager.register_callback(
         CheckpointCallback(
@@ -166,7 +193,7 @@ def main():
     )
 
     print(f"Starting {args.profile} training for {epochs} epochs...")
-    manager.start_training()
+    manager.start_training(start_epoch=start_epoch)
     print("Training finished. Baseline frozen.")
 
 

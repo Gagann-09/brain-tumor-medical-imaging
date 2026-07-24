@@ -73,7 +73,7 @@ class EvaluationEngine(BaseEngine):
     def __init__(self, model: Any, event_bus: EventBus):
         super().__init__(model, event_bus)
 
-    def evaluate(self, dataloader: Any) -> dict[str, float]:
+    def evaluate(self, dataloader: Any, epoch_idx: int = 1) -> dict[str, float]:
         """
         Executes evaluation over the dataset.
         """
@@ -99,7 +99,7 @@ class EvaluationEngine(BaseEngine):
         avg_loss = total_loss / max(1, num_batches)
         avg_metrics = {k: v / max(1, num_batches) for k, v in all_metrics.items()}
         metrics = {"val_loss": avg_loss, **avg_metrics}
-        self.event_bus.publish(Event(EventType.EVALUATION_END, {"mode": "val", "metrics": metrics}))
+        self.event_bus.publish(Event(EventType.EVALUATION_END, {"mode": "val", "metrics": metrics, "epoch": epoch_idx}))
         return metrics
 
 

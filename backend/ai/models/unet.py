@@ -25,15 +25,30 @@ class UNet3D(BaseModel):
         from ai.models.base import ValidationOutput
 
         loss = self.compute_loss(None, None)
+        image_np = None
+        label_np = None
+        if isinstance(batch, dict):
+            if "image" in batch:
+                image_np = batch["image"][0, 0].numpy()
+            elif "images" in batch:
+                image_np = batch["images"][0, 0].numpy()
+            if "label" in batch:
+                label_np = batch["label"][0, 0].numpy()
+            elif "mask" in batch:
+                label_np = batch["mask"][0, 0].numpy()
+        elif isinstance(batch, (list, tuple)) and len(batch) >= 2:
+            image_np = batch[0][0, 0].numpy()
+            label_np = batch[1][0, 0].numpy()
+
         return ValidationOutput(
             loss=loss.item(),
             metrics=self.compute_metrics(None, None),
             predictions=[
                 {
                     "case_id": "mock_case",
-                    "image": batch["image"][0, 0].numpy(),
-                    "gt": batch["label"][0, 0].numpy(),
-                    "pred": batch["label"][0, 0].numpy(),
+                    "image": image_np if image_np is not None else [],
+                    "gt": label_np if label_np is not None else [],
+                    "pred": label_np if label_np is not None else [],
                     "dice": 0.5,
                     "hausdorff": 1.0,
                     "pred_sum": 10,

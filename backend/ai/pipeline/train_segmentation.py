@@ -52,15 +52,15 @@ def main():
 
     # 1. Configuration
     config = ExperimentConfig(
-        model=ModelConfig(name="UNetBaseline", in_channels=4, out_channels=3),
-        dataset=DatasetConfig(name="BraTS", data_dir=args.data_dir, batch_size=2),
+        model=ModelConfig(name="UNetBaseline", in_channels=4, out_channels=1),
+        dataset=DatasetConfig(registry_id="brats_dummy", batch_size=2),
         optimizer=OptimizerConfig(name="AdamW", learning_rate=1e-4),
-        hardware=HardwareConfig(device="cuda"),
-        experiment_name="brats_baseline_unet",
+        hardware=HardwareConfig(device="cpu"), # Mock data, run on CPU to avoid CUDA initialization overhead
+        max_epochs=1
     )
 
     # 2. Dataset Integration
-    adapter = BraTSAdapter(root_dir=config.dataset.data_dir)
+    adapter = BraTSAdapter(root_dir=args.data_dir)
     studies = list(adapter.load_studies())
 
     split_manager = DatasetSplitManager(PatientSplitStrategy(seed=config.seed))
@@ -108,7 +108,7 @@ def main():
     strategy.event_bus = manager.event_bus
 
     # 5. Callbacks
-    save_dir = Path(args.output_dir) / config.experiment_name
+    save_dir = Path(args.output_dir) / config.logging.experiment_name
     manager.register_callback(
         CheckpointCallback(
             save_dir=str(save_dir / "checkpoints"), model=model, strategy=strategy, config=config
@@ -122,11 +122,23 @@ def main():
                 "model_name": config.model.name,
                 "architecture": "3D U-Net",
                 "description": "Baseline segmentation model for BraTS.",
-                "limitations": "Trained on small sample, for baseline purposes only.",
+                "limitations": ["Trained on small sample, for baseline purposes only."],
             },
             save_dir=str(save_dir),
         )
     )
+
+    # 5.5 Experiment Manager Integration
+    from ai.experiment_tracking.callbacks import ExperimentManagerCallback
+    from ai.experiment_tracking.experiment_manager import ExperimentManager
+
+    em = ExperimentManager(base_dir=str(Path(args.output_dir) / "experiments"))
+    em_callback = ExperimentManagerCallback(
+        experiment_manager=em,
+        checkpoint_dir=str(save_dir / "checkpoints"),
+        artifact_dir=str(save_dir)
+    )
+    manager.register_callback(em_callback)
 
     # 6. Start Training
     manager.start_training()

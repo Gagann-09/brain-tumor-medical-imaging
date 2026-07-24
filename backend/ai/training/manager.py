@@ -60,7 +60,7 @@ class TrainingManager:
     def register_callback(self, callback: Callback) -> None:
         self.callback_manager.add_callback(callback)
 
-    def start_training(self) -> None:
+    def start_training(self, start_epoch: int = 1) -> None:
         """Start the training loop."""
         self.callback_manager.setup_bus()
         self.event_bus.publish(Event(EventType.TRAINING_START, {"config": self.config}))
@@ -72,12 +72,12 @@ class TrainingManager:
             self.event_bus.publish(Event(EventType.GAN_TRAINING_STARTED, {"config": self.config}))
 
         try:
-            for epoch in range(1, self.config.max_epochs + 1):
+            for epoch in range(start_epoch, self.config.max_epochs + 1):
                 # Train
                 train_metrics = self.train_engine.train_epoch(self.train_loader, epoch)
 
                 # Evaluate
-                val_metrics = self.eval_engine.evaluate(self.val_loader)
+                val_metrics = self.eval_engine.evaluate(self.val_loader, epoch)
 
                 # Monitor Robustness
                 train_loss = train_metrics.get("loss", 0.0)

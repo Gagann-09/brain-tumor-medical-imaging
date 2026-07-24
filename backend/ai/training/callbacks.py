@@ -110,6 +110,7 @@ class CheckpointCallback(Callback):
     def on_evaluation_end(self, event: Event) -> None:
         metrics = event.data.get("metrics", {})
         val_metric = metrics.get(self.monitor_metric)
+        self.current_epoch = event.data.get("epoch", 1)  # Get epoch or default to 1
         if val_metric is None:
             return
 
@@ -141,6 +142,7 @@ class CheckpointCallback(Callback):
             "optimizer_state": optimizer_state,
             # "scheduler_state": self.strategy.scheduler.state_dict() if hasattr(self.strategy, 'scheduler') else None,
             "metrics": metrics,
+            "epoch": getattr(self, "current_epoch", 1),
             "experiment_id": getattr(self.config, "experiment_name", "unknown"),
             "config": self.config.model_dump() if hasattr(self.config, "model_dump") else {},
             # "git_hash": ...

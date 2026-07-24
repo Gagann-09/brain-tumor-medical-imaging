@@ -170,6 +170,8 @@ comparison_report.md
 datasets/**
 !datasets/README.md
 !datasets/**/.gitkeep
+/dummy_brats/
+/BraTS/
 /uploads/
 /storage/
 /cache/
