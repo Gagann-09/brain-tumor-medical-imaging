@@ -136,13 +136,22 @@ class CheckpointCallback(Callback):
         if hasattr(self.strategy.optimizer, "state_dict"):
             optimizer_state = self.strategy.optimizer.state_dict()
 
+        # Extract scheduler state
+        scheduler_state = None
+        if hasattr(self.strategy, "scheduler") and self.strategy.scheduler:
+            if isinstance(self.strategy.scheduler, dict):
+                scheduler_state = {k: v.state_dict() for k, v in self.strategy.scheduler.items()}
+            else:
+                scheduler_state = self.strategy.scheduler.state_dict()
+
         # Extensive serialization
         checkpoint = {
             "model_state": self.model.state_dict(),
             "optimizer_state": optimizer_state,
-            # "scheduler_state": self.strategy.scheduler.state_dict() if hasattr(self.strategy, 'scheduler') else None,
+            "scheduler_state": scheduler_state,
             "metrics": metrics,
             "epoch": getattr(self, "current_epoch", 1),
+            "global_step": getattr(self, "current_epoch", 1),  # Using epoch as a placeholder for global step if not explicitly tracked
             "experiment_id": getattr(self.config, "experiment_name", "unknown"),
             "config": self.config.model_dump() if hasattr(self.config, "model_dump") else {},
             # "git_hash": ...

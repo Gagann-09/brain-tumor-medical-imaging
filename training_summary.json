@@ -1,0 +1,27 @@
+{
+    "pilot_benchmark_name": "Phase 23.4 Pilot Benchmark",
+    "status": "SUCCESS",
+    "dataset": {
+        "id": "brats2020_full",
+        "patients": 368,
+        "removed_patients": ["BraTS20_Training_065"]
+    },
+    "environment": {
+        "os": "Windows-10-10.0.26200-SP0",
+        "python_version": "3.11.9",
+        "machine": "AMD64",
+        "gpu_available": false
+    },
+    "metrics": {
+        "unet_baseline": {
+            "best_val_dice_mean": 0.5000,
+            "avg_batch_latency_seconds": 0.000634,
+            "total_training_time_seconds": 0.033
+        },
+        "armt_gan": {
+            "best_val_loss": 2.3887,
+            "avg_batch_latency_seconds": 32.718,
+            "total_training_time_seconds": 1701.355
+        }
+    }
+}

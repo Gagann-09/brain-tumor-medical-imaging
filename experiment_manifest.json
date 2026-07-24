@@ -1,0 +1,20 @@
+{
+    "pilot_benchmark_name": "Phase 23.4 Pilot Benchmark",
+    "dataset": "datasets/brats2020_full",
+    "experiments": {
+        "unet_baseline": {
+            "experiment_id": "unet_baseline_research",
+            "model_architecture": "UNet3D",
+            "epochs": 2,
+            "output_dir": "outputs/experiments/exp_20260724_205306_ab8d72ea",
+            "best_checkpoint": "checkpoint_1784906587_val_dice_mean_0.5000.pth"
+        },
+        "armt_gan": {
+            "experiment_id": "exp_20260724_205440_c079e47a",
+            "model_architecture": "ARMTGAN",
+            "epochs": 2,
+            "output_dir": "outputs/experiments/exp_20260724_205440_c079e47a",
+            "best_checkpoint": "checkpoint_1784908508_val_loss_2.3887.pth"
+        }
+    }
+}

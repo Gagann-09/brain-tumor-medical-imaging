@@ -69,7 +69,7 @@ def main():
 
     config = ExperimentConfig(
         model=ModelConfig(name="ARMTGANModel", in_channels=4, out_channels=1),
-        dataset=DatasetConfig(registry_id="BraTS", batch_size=2, kwargs={"data_dir": args.data_dir}),
+        dataset=DatasetConfig(registry_id="brats20_full", batch_size=2, kwargs={"data_dir": args.data_dir}),
         optimizer=OptimizerConfig(name="AdamW", learning_rate=2e-4),
         hardware=HardwareConfig(device="cpu"), # Defaulting to cpu to allow testing easily if no GPU
         logging=LoggingConfig(experiment_name="brats_armt_gan"),
@@ -87,13 +87,17 @@ def main():
         studies, train_ratio=0.8, val_ratio=0.2
     )
 
+    from monai.transforms import SpatialPadd
+
+    pad_transform = SpatialPadd(keys=["image", "label"], spatial_size=(240, 240, 160))
+
     train_loader = torch.utils.data.DataLoader(
-        PyTorchDatasetAdapter(TrainingDataset(train_studies)),
+        PyTorchDatasetAdapter(TrainingDataset(train_studies), transforms=pad_transform),
         batch_size=config.dataset.batch_size,
         shuffle=True,
     )
     val_loader = torch.utils.data.DataLoader(
-        PyTorchDatasetAdapter(ValidationDataset(val_studies)),
+        PyTorchDatasetAdapter(ValidationDataset(val_studies), transforms=pad_transform),
         batch_size=config.dataset.batch_size,
         shuffle=False,
     )
@@ -130,10 +134,14 @@ def main():
     # Model
     model = ARMTGANModel(loss_manager=loss_mgr)
 
-    # Optimizers
+    # Optimizers & Schedulers
     opt_g = torch.optim.AdamW(model.generator.parameters(), lr=config.optimizer.learning_rate)
     opt_d = torch.optim.AdamW(model.discriminator.parameters(), lr=config.optimizer.learning_rate)
     multi_opt = MultiOptimizerManager({"generator": opt_g, "discriminator": opt_d})
+
+    scheduler_g = torch.optim.lr_scheduler.CosineAnnealingLR(opt_g, T_max=config.max_epochs)
+    scheduler_d = torch.optim.lr_scheduler.CosineAnnealingLR(opt_d, T_max=config.max_epochs)
+    schedulers = {"generator": scheduler_g, "discriminator": scheduler_d}
 
     hardware_manager = PyTorchHardwareManager(device_type=config.hardware.device)
     mixed_precision = DummyMixedPrecision(device_type=hardware_manager.device.type)
@@ -149,6 +157,15 @@ def main():
                 multi_opt.load_state_dict(checkpoint["optimizer_state"])
             except Exception as e:
                 print(f"Failed to load optimizer state: {e}")  # noqa: T201
+        if checkpoint.get("scheduler_state"):
+            try:
+                scheduler_state = checkpoint["scheduler_state"]
+                if "generator" in scheduler_state:
+                    scheduler_g.load_state_dict(scheduler_state["generator"])
+                if "discriminator" in scheduler_state:
+                    scheduler_d.load_state_dict(scheduler_state["discriminator"])
+            except Exception as e:
+                print(f"Failed to load scheduler state: {e}")  # noqa: T201
         if "epoch" in checkpoint:
             start_epoch = checkpoint["epoch"] + 1
 
@@ -159,6 +176,7 @@ def main():
         hardware=hardware_manager,
         event_bus=None,
         update_policy=AlternatingUpdatePolicy(),
+        scheduler=schedulers,
     )
 
     manager = TrainingManager(

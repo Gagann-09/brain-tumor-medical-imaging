@@ -85,11 +85,20 @@ class TrainingManager:
                 self.overfitting_monitor.update(train_loss, val_loss)
                 self.underfitting_monitor.update(train_loss, val_loss)
 
-                if self.early_stopping_policy.should_stop(
-                    self.overfitting_monitor.is_overfitting,
-                    self.underfitting_monitor.is_underfitting,
-                ):
-                    break
+                # Scheduler Step
+                if hasattr(self.strategy, "scheduler") and self.strategy.scheduler:
+                    if isinstance(self.strategy.scheduler, dict):
+                        for sched in self.strategy.scheduler.values():
+                            sched.step()
+                    else:
+                        self.strategy.scheduler.step()
+
+                # Implicit Early Stopping is officially DISABLED to honor max_epochs natively.
+                # if self.early_stopping_policy.should_stop(
+                #     self.overfitting_monitor.is_overfitting,
+                #     self.underfitting_monitor.is_underfitting,
+                # ):
+                #     break
 
         except KeyboardInterrupt:
             self.event_bus.publish(Event(EventType.ERROR, {"error": "KeyboardInterrupt"}))

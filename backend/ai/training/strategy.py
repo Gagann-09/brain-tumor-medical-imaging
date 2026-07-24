@@ -10,11 +10,12 @@ class TrainingStrategy(abc.ABC):
     mixed precision scaling, and distributed synchronization.
     """
 
-    def __init__(self, optimizer: Any, mixed_precision: Any, hardware: Any, event_bus: EventBus):
+    def __init__(self, optimizer: Any, mixed_precision: Any, hardware: Any, event_bus: EventBus, scheduler: Any = None):
         self.optimizer = optimizer
         self.mixed_precision = mixed_precision
         self.hardware = hardware
         self.event_bus = event_bus
+        self.scheduler = scheduler
 
     @abc.abstractmethod
     def execute_step(self, model: Any, batch: Any, batch_idx: int) -> dict[str, float]:
@@ -75,8 +76,9 @@ class GANTrainingStrategy(TrainingStrategy):
         hardware: Any,
         event_bus: EventBus,
         update_policy: GANUpdatePolicy | None = None,
+        scheduler: Any = None,
     ):
-        super().__init__(optimizer, mixed_precision, hardware, event_bus)
+        super().__init__(optimizer, mixed_precision, hardware, event_bus, scheduler)
         self.update_policy = update_policy or AlternatingUpdatePolicy()
 
     def execute_step(self, model: Any, batch: Any, batch_idx: int) -> dict[str, float]:

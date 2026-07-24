@@ -3,6 +3,7 @@ from pathlib import Path
 
 # PyTorch Integration
 import torch
+from monai.transforms import SpatialPadd
 
 # AI Platform Core
 from ai.config.training_config import (
@@ -18,7 +19,12 @@ from ai.datasets.split_manager import DatasetSplitManager, PatientSplitStrategy
 
 # Segmentation Specifics
 from ai.segmentation.models.unet import UNetBaseline
-from ai.training.callbacks import CheckpointCallback, ModelCardCallback
+from ai.training.callbacks import (
+    CheckpointCallback,
+    ModelCardCallback,
+    RuntimeMonitorCallback,
+    TrainingHealthCallback,
+)
 from ai.training.components import MixedPrecisionManager
 from ai.training.data import TrainingDataset, ValidationDataset
 from ai.training.hardware import PyTorchHardwareManager
@@ -48,15 +54,17 @@ def main():
     parser = argparse.ArgumentParser(description="Train Baseline Segmentation Model")
     parser.add_argument("--data_dir", type=str, required=True, help="Path to BraTS dataset")
     parser.add_argument("--output_dir", type=str, default="./outputs", help="Output directory")
+    parser.add_argument("--epochs", type=int, default=100, help="Number of training epochs")
+    parser.add_argument("--resume_from", type=str, default=None, help="Path to checkpoint to resume from")
     args = parser.parse_args()
 
     # 1. Configuration
     config = ExperimentConfig(
         model=ModelConfig(name="UNetBaseline", in_channels=4, out_channels=1),
-        dataset=DatasetConfig(registry_id="brats_dummy", batch_size=2),
+        dataset=DatasetConfig(registry_id="brats20_full", batch_size=2, kwargs={"data_dir": args.data_dir}),
         optimizer=OptimizerConfig(name="AdamW", learning_rate=1e-4),
         hardware=HardwareConfig(device="cpu"), # Mock data, run on CPU to avoid CUDA initialization overhead
-        max_epochs=1
+        max_epochs=args.epochs
     )
 
     # 2. Dataset Integration
@@ -68,8 +76,10 @@ def main():
         studies, train_ratio=0.8, val_ratio=0.2
     )
 
-    train_ds = PyTorchDatasetAdapter(TrainingDataset(train_studies))
-    val_ds = PyTorchDatasetAdapter(ValidationDataset(val_studies))
+    pad_transform = SpatialPadd(keys=["image", "label"], spatial_size=(240, 240, 160))
+
+    train_ds = PyTorchDatasetAdapter(TrainingDataset(train_studies), transforms=pad_transform)
+    val_ds = PyTorchDatasetAdapter(ValidationDataset(val_studies), transforms=pad_transform)
 
     train_loader = torch.utils.data.DataLoader(
         train_ds, batch_size=config.dataset.batch_size, shuffle=True
@@ -83,15 +93,29 @@ def main():
         in_channels=config.model.in_channels, out_channels=config.model.out_channels
     )
     optimizer = torch.optim.AdamW(model.parameters(), lr=config.optimizer.learning_rate)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=config.max_epochs)
 
     hardware_manager = PyTorchHardwareManager(device_type=config.hardware.device)
     mixed_precision = DummyMixedPrecision(device_type=hardware_manager.device.type)
+
+    start_epoch = 1
+    if args.resume_from:
+        print(f"Resuming from checkpoint: {args.resume_from}")  # noqa: T201
+        checkpoint = torch.load(args.resume_from, map_location="cpu", weights_only=False)
+        model.load_state_dict(checkpoint["model_state"])
+        if checkpoint.get("optimizer_state"):
+            optimizer.load_state_dict(checkpoint["optimizer_state"])
+        if checkpoint.get("scheduler_state"):
+            scheduler.load_state_dict(checkpoint["scheduler_state"])
+        if "epoch" in checkpoint:
+            start_epoch = checkpoint["epoch"] + 1
 
     strategy = StandardTrainingStrategy(
         optimizer=optimizer,
         mixed_precision=mixed_precision,
         hardware=hardware_manager,
         event_bus=None,  # Set later by TrainingManager
+        scheduler=scheduler
     )
 
     # 4. Orchestrator
@@ -109,9 +133,18 @@ def main():
 
     # 5. Callbacks
     save_dir = Path(args.output_dir) / config.logging.experiment_name
+
+    manager.register_callback(RuntimeMonitorCallback())
+    manager.register_callback(TrainingHealthCallback())
+
     manager.register_callback(
         CheckpointCallback(
-            save_dir=str(save_dir / "checkpoints"), model=model, strategy=strategy, config=config
+            save_dir=str(save_dir / "checkpoints"),
+            model=model,
+            strategy=strategy,
+            config=config,
+            monitor_metric="val_dice",
+            mode="max",
         )
     )
 
@@ -141,7 +174,7 @@ def main():
     manager.register_callback(em_callback)
 
     # 6. Start Training
-    manager.start_training()
+    manager.start_training(start_epoch=start_epoch)
 
 
 if __name__ == "__main__":

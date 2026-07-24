@@ -1,0 +1,21 @@
+{
+    "environment": {
+        "os": "Windows-10-10.0.26200-SP0",
+        "python_version": "3.11.9",
+        "machine": "AMD64",
+        "processor": "AMD64 Family 23 Model 104 Stepping 1, AuthenticAMD",
+        "gpu_available": false
+    },
+    "models": {
+        "unet_baseline": {
+            "avg_batch_latency_seconds": 0.0006340421163118803,
+            "total_steps": 52,
+            "total_training_time_seconds": 0.03297019004821777
+        },
+        "armt_gan": {
+            "avg_batch_latency_seconds": 32.71837637974666,
+            "total_steps": 52,
+            "total_training_time_seconds": 1701.3555717468262
+        }
+    }
+}
